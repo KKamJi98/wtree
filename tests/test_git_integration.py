@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-import wt.cli as cli
+import wtree.cli as cli
 
 
 def _git(cwd: Path, *args: str) -> subprocess.CompletedProcess[str]:

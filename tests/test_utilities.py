@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from subprocess import CompletedProcess
 
-import wt.cli as cli
-from wt.cli import Worktree
+import wtree.cli as cli
+from wtree.cli import Worktree
 
 
 def _ok(stdout: str = "", stderr: str = "") -> CompletedProcess[str]:

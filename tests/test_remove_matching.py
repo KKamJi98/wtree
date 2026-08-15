@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from wt.cli import Worktree, find_worktrees_by_identifier, find_worktrees_by_pattern
+from wtree.cli import Worktree, find_worktrees_by_identifier, find_worktrees_by_pattern
 
 
 def _wt(branch: str, path: str) -> Worktree:

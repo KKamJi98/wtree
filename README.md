@@ -1,4 +1,4 @@
-# git-worktree-tool (wt)
+# wtree
 
 Git worktree 구조의 bare repository를 관리하는 CLI 도구입니다.
 어떤 worktree 디렉토리에서든 `wt` 명령으로 전체 worktree를 관리할 수 있습니다.
@@ -15,12 +15,17 @@ Git worktree 구조의 bare repository를 관리하는 CLI 도구입니다.
 ## Installation
 
 ```bash
-# 개발 모드 설치
-uv tool install --editable ~/code/code-personal/kkamji-lab/tools/git-worktree-tool
+# PyPI
+uv tool install wtree
 
-# 또는 일반 설치
-uv tool install ~/code/code-personal/kkamji-lab/tools/git-worktree-tool
+# 저장소에서 바로
+uv tool install git+https://github.com/KKamJi98/wtree
+
+# 로컬 개발 모드
+uv tool install --editable .
 ```
+
+패키지 이름은 `wtree`, 명령어는 `wt`입니다.
 
 ## Quick Start
 
@@ -284,7 +289,7 @@ git worktree add ../staging staging
 
 - Python 3.9+
 - Git 2.15+ (worktree support)
-- Git 2.38+ (`wt remove -b`의 squash/rebase-merge 자동 감지 — `merge-tree --write-tree`. 미만 버전에서는 해당 브랜치가 보존되며 수동 삭제가 필요)
+- Git 2.38+ (`wt remove -b`의 squash/rebase-merge 자동 감지 - `merge-tree --write-tree`. 미만 버전에서는 해당 브랜치가 보존되며 수동 삭제가 필요)
 
 ## License
 

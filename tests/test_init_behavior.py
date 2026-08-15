@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from subprocess import CompletedProcess
 
-import wt.cli as cli
+import wtree.cli as cli
 
 
 def _ok(stdout: str = "", stderr: str = "") -> CompletedProcess[str]:
