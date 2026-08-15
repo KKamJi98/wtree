@@ -1,16 +1,25 @@
 # wtree
 
-Git worktree 구조의 bare repository를 관리하는 CLI 도구입니다.
-어떤 worktree 디렉토리에서든 `wt` 명령으로 전체 worktree를 관리할 수 있습니다.
+[![PyPI](https://img.shields.io/pypi/v/wtree)](https://pypi.org/project/wtree/)
+[![CI](https://github.com/KKamJi98/wtree/actions/workflows/ci.yml/badge.svg)](https://github.com/KKamJi98/wtree/actions/workflows/ci.yml)
+
+Manage a bare repository and its worktrees from any directory inside it.
+
+`git worktree` lets you keep several branches checked out at once, but it leaves
+the bookkeeping to you: which worktrees exist, which are behind, which have
+uncommitted work, and which branch is safe to delete. `wt` answers those from
+wherever you happen to be standing.
+
+The package is `wtree`; the command is `wt`.
 
 ## Features
 
-- **wt init**: bare repository 초기 설정 자동화
-- **wt add/remove**: worktree 추가/삭제 (`wt rm`은 기본적으로 worktree만 삭제, 복수/패턴 삭제 지원)
-- **wt status**: 모든 worktree의 상태 (clean/dirty, sync 상태) 확인
-- **wt fetch**: bare repo에서 `git fetch --all --prune` 실행
-- **wt pull**: fetch 후 모든 worktree를 동기화 (기본 ff-only, `--rebase` 옵션)
-- **wt upstream**: 모든 worktree에 `origin/<branch>` upstream 자동 설정
+- **wt init**: set up a bare repository and its first worktrees in one step
+- **wt add / remove**: add and remove worktrees, with pattern matching and a dry run
+- **wt status**: clean/dirty and ahead/behind for every worktree at once
+- **wt fetch**: `git fetch --all --prune` against the bare repository
+- **wt pull**: fetch, then sync every worktree (fast-forward only by default)
+- **wt upstream**: point every worktree at `origin/<branch>`
 
 ## Installation
 
@@ -18,136 +27,134 @@ Git worktree 구조의 bare repository를 관리하는 CLI 도구입니다.
 # PyPI
 uv tool install wtree
 
-# 저장소에서 바로
+# Straight from the repository
 uv tool install git+https://github.com/KKamJi98/wtree
 
-# 로컬 개발 모드
+# Local development
 uv tool install --editable .
 ```
-
-패키지 이름은 `wtree`, 명령어는 `wt`입니다.
 
 ## Quick Start
 
 ```bash
-# 새 프로젝트 시작 (bare repo + worktree 자동 설정)
+# Start a new project: bare repo and worktrees in one command
 wt init git@github.com:org/repo.git my-project
 
-# 생성 결과:
+# What you get:
 # my-project/
 # ├── .bare/    # bare repository
-# └── main/     # main branch worktree
+# └── main/     # worktree for the default branch
 
-# 추가 브랜치와 함께 초기화
+# Bring extra branches along
 wt init git@github.com:org/repo.git my-project -w staging,develop
 ```
 
 ## Usage
 
-### 초기화 (wt init)
+### Initialise (wt init)
 
 ```bash
-# 기본 초기화 (URL에서 repo 이름 자동 추출)
+# Repository name is taken from the URL
 wt init git@github.com:org/repo.git
 
-# 경로 지정
+# Or name the directory yourself
 wt init git@github.com:org/repo.git my-project
 
-# 추가 worktree 브랜치 지정
+# Create extra worktrees up front
 wt init git@github.com:org/repo.git my-project -w staging,develop,feat/new-feature
 ```
 
-### Worktree 관리 (wt add/remove)
+### Add and remove worktrees
 
 ```bash
-# 기존 브랜치로 worktree 추가
+# Existing branch
 wt add staging
 
-# 새 브랜치 생성하면서 worktree 추가
+# Create the branch as you add it
 wt add feat/my-feature -c
 
-# 특정 브랜치 기반으로 새 브랜치 생성 (예: staging에서 분기)
+# Branch off something other than the default
 wt add chore/test123 -c --base staging
 
-# worktree만 삭제 (로컬 브랜치는 유지)
+# Remove the worktree, keep the local branch
 wt remove staging
 
-# worktree + 로컬 브랜치 삭제
+# Remove the worktree and the local branch
 wt remove feat/my-feature -b
 
-# worktree + 로컬 브랜치 + 원격 브랜치 삭제
+# Remove the worktree, the local branch, and the remote branch
 wt remove feat/my-feature -b --remote
 
-# 여러 worktree 한 번에 삭제
+# Several at once
 wt remove provider exemplars
 
-# 패턴으로 일괄 삭제 (branch/path name/full path glob)
+# By glob, matched against branch, directory name, and full path
 wt remove --match "fix/*"
 
-# 실제 삭제 없이 대상만 확인
+# See what would go without removing anything
 wt remove --match "feat/*" --dry-run
 
-# 강제 삭제 (dirty 상태여도)
+# Remove even if the worktree is dirty
 wt remove staging -f
 ```
 
-`wt remove`는 기본적으로 worktree entry와 디렉토리만 제거합니다.
-로컬 브랜치까지 같이 정리하려면 `-b/--branch`를 명시적으로 사용하세요.
-원격 브랜치까지 삭제하려면 `--remote`를 함께 사용하되, `--remote`는 `-b/--branch`가 필요합니다.
+`wt remove` takes the worktree entry and its directory, and nothing else. Pass
+`-b/--branch` to delete the local branch too, and `--remote` on top of that to
+delete the remote one. `--remote` without `-b` is an error rather than a
+surprise.
 
-`-b`로 브랜치를 삭제할 때, 머지되지 않은 브랜치는 커밋 손실을 막기 위해 **안전하게 보존**되며
-`WARN branch kept`으로 표시됩니다(에러 아님, exit code는 2). 보존된 브랜치는 머지 여부를
-확인한 뒤 `wt rm -f -b <id>` 또는 `git -C <repo>/.bare branch -D <branch>`로 강제 삭제할 수 있습니다.
-로컬 브랜치가 보존되면 `--remote`가 있어도 원격 브랜치는 삭제하지 않습니다(유일 사본 보호).
-`--dry-run -b`는 현재 refs 기준으로 로컬/원격 브랜치가 삭제될지, 보존될지, 검증 불가인지 미리 표시합니다.
+When `-b` would delete a branch that is not merged anywhere, **the branch is kept**
+and reported as `WARN branch kept`. That is not a failure, but it does set exit
+code 2. Check whether the work is really gone, then force it with
+`wt rm -f -b <id>` or `git -C <repo>/.bare branch -D <branch>`.
 
-### 새 원격 브랜치를 worktree로 추가
+A kept local branch also stops `--remote`, even when you asked for it: the remote
+may be the only copy left. `--dry-run -b` shows, against current refs, which
+branches would be deleted, which would be kept, and which cannot be judged.
+
+### Add a worktree for a new remote branch
 
 ```bash
-# 1) 원격 최신화
-wt fetch
-
-# 2) 원격 브랜치를 worktree로 추가
+wt fetch                      # see the branch first
 wt add feature/new-remote
-
-# 3) upstream이 없으면(선택)
-wt upstream
+wt upstream                   # only if it has no upstream yet
 ```
 
-### 상태 확인 (wt status)
+### Status
 
 ```bash
 wt status
 wt st
 ```
 
-### 동기화 (wt fetch/pull)
+### Sync
 
 ```bash
-# 원격에서 fetch (bare repo에서 실행)
+# Fetch into the bare repository
 wt fetch
 wt f
 
-# fetch + 모든 worktree 동기화 (ff-only)
+# Fetch, then fast-forward every worktree
 wt pull
 wt p
 
-# rebase 모드로 동기화
+# Rebase instead
 wt pull --rebase
 wt p -r
 ```
 
-`wt pull`은 각 브랜치에 설정된 실제 upstream ref(`@{u}`)를 기준으로 동기화합니다.
-일반적인 경우는 `origin/<branch>`이지만, 다른 remote를 upstream으로 지정한 브랜치도 그대로 따릅니다.
+`wt pull` follows each branch's configured upstream (`@{u}`), not a guess. That
+is usually `origin/<branch>`, but a branch tracking a different remote is synced
+against the remote it actually tracks.
 
-### 기타
+### Everything else
 
 ```bash
-# worktree 목록 확인
+# List worktrees
 wt list
 wt ls
 
-# 모든 worktree에 upstream 설정 (origin/<branch>)
+# Set origin/<branch> as upstream everywhere it is missing
 wt upstream
 wt up
 ```
@@ -220,76 +227,81 @@ Step 2: Sync worktrees
 Summary: ok=2 skip=1 fail=0
 ```
 
-## Git Worktree 구조
-
-이 도구는 다음과 같은 bare repository + worktree 구조를 사용합니다:
+## The layout
 
 ```
 my-project/
 ├── .bare/              # bare repository (git clone --bare)
-├── main/               # worktree for main branch
-├── staging/            # worktree for staging branch
-└── feat-new-feature/   # worktree for feature branch
+├── main/               # worktree for main
+├── staging/            # worktree for staging
+└── feat-new-feature/   # worktree for a feature branch
 ```
 
-루트 디렉토리(`my-project/`)는 컨테이너 역할만 하며 `.git` 파일/디렉토리를 생성하지 않습니다.
+The root directory is only a container. No `.git` file or directory is created
+there, so nothing about it looks like a checkout.
 
-### 수동 설정 방법 (참고)
+### Doing it by hand
 
-`wt init` 없이 수동으로 설정하려면:
+For reference, `wt init` is equivalent to:
 
 ```bash
-# 1. bare repository 클론
+# 1. Clone as a bare repository
 git clone --bare git@github.com:org/repo.git my-project/.bare
 
-# 2. fetch 설정
+# 2. Teach it to track remote branches
 cd my-project/.bare
 git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 git fetch --all
 
-# 3. worktree 추가
+# 3. Add worktrees
 git worktree add ../main main
 git worktree add ../staging staging
 ```
 
-## Safety Features
+## Safety
 
-- **ff-only by default**: `wt pull`은 기본적으로 fast-forward만 수행합니다. 로컬 커밋이 있으면 실패합니다.
-- **optional rebase**: `--rebase` 옵션 사용 시 rebase 수행, 충돌 시 자동 abort됩니다.
-- **dirty check**: uncommitted 변경이 있거나 상태 확인에 실패한 worktree는 안전하게 스킵합니다.
-- **no upstream skip**: upstream이 설정되지 않은 브랜치는 스킵합니다.
+- **Fast-forward only by default**: `wt pull` refuses to rewrite. A worktree with
+  local commits fails rather than being merged behind your back.
+- **Rebase is opt-in**: `--rebase` rebases, and aborts on conflict instead of
+  leaving you mid-rebase in a directory you were not looking at.
+- **Dirty worktrees are skipped**: uncommitted work is never touched, and a
+  worktree whose status cannot be read counts as dirty rather than as safe.
+- **Branches without an upstream are skipped**: nothing is invented for them.
 
 ## Command Reference
 
 | Command | Alias | Description |
 |---------|-------|-------------|
-| `wt init <url> [path]` | - | 새 bare repo + worktree 초기화 |
-| `wt add <branch>` | `a` | worktree 추가 |
-| `wt remove <identifier...> [--match <glob>] [--dry-run]` | `rm` | worktree 삭제, 로컬 브랜치는 기본 유지 (`-b`로 함께 삭제) |
-| `wt status` | `st` | 모든 worktree 상태 확인 |
+| `wt init <url> [path]` | - | Create the bare repo and its first worktrees |
+| `wt add <branch>` | `a` | Add a worktree |
+| `wt remove <identifier...> [--match <glob>] [--dry-run]` | `rm` | Remove worktrees; keeps the local branch unless `-b` |
+| `wt status` | `st` | Clean/dirty and sync state for every worktree |
 | `wt fetch` | `f` | `git fetch --all --prune` |
-| `wt pull` | `p` | fetch + ff-only (기본) |
-| `wt pull --rebase` | `p -r` | fetch + rebase |
-| `wt list` | `ls` | worktree 목록 |
-| `wt upstream` | `up` | upstream 자동 설정 |
+| `wt pull` | `p` | Fetch, then fast-forward |
+| `wt pull --rebase` | `p -r` | Fetch, then rebase |
+| `wt list` | `ls` | List worktrees |
+| `wt upstream` | `up` | Set the missing upstreams |
 
 ## Exit Codes
 
-`status`, `pull`, `upstream`, `remove`는 다음 규약을 따릅니다:
+`status`, `pull`, `upstream`, and `remove` share one convention.
 
-| Code | 의미 |
-|------|------|
-| `0` | 모든 대상 성공 (요청한 worktree/branch/remote 작업 완료) |
-| `1` | 사용 오류 또는 치명적 상황 (worktree 없음, 매칭 없음, 사용자 중단, `--remote`를 `-b` 없이 사용) |
-| `2` | 부분 완료 (일부 `SKIP`/`WARN(kept)`/`FAIL`, 또는 매칭되지 않은 identifier/pattern 존재) |
+| Code | Meaning |
+|------|---------|
+| `0` | Everything asked for succeeded |
+| `1` | Usage error or a dead end: no worktrees, nothing matched, cancelled, `--remote` without `-b` |
+| `2` | Partly done: some `SKIP`, `WARN(kept)`, or `FAIL`, or an identifier that matched nothing |
 
-`status`는 dirty worktree가 있으면 `2`, `remove`는 보존된 브랜치(`kept`)가 있어도 `2`를 반환합니다.
+`status` returns `2` when any worktree is dirty, and `remove` returns `2` when it
+kept a branch it was asked to delete.
 
 ## Requirements
 
 - Python 3.9+
-- Git 2.15+ (worktree support)
-- Git 2.38+ (`wt remove -b`의 squash/rebase-merge 자동 감지 - `merge-tree --write-tree`. 미만 버전에서는 해당 브랜치가 보존되며 수동 삭제가 필요)
+- Git 2.15+ for worktrees
+- Git 2.38+ for `wt remove -b` to recognise squash and rebase merges, which needs
+  `merge-tree --write-tree`. On older Git those branches are kept and have to be
+  deleted by hand.
 
 ## License
 
