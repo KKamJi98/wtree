@@ -25,6 +25,14 @@ dependencies = ["argcomplete>=3.0.0,<4"]
 [project.optional-dependencies]
 dev = ["pytest>=8.0.0", "ruff>=0.8.0"]
 
+# PyPI shows no way back to the source without these. The project page carried a
+# summary and nothing else: no repository, no issue tracker.
+[project.urls]
+Homepage = "https://github.com/KKamJi98/wtree"
+Source = "https://github.com/KKamJi98/wtree"
+Issues = "https://github.com/KKamJi98/wtree/issues"
+Changelog = "https://github.com/KKamJi98/wtree/releases"
+
 [project.scripts]
 wt = "wtree.cli:main"
 
