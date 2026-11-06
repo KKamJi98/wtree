@@ -613,3 +613,16 @@ fn remove_failure_messages_are_english() {
     );
     assert!(out.is_ascii(), "{out}");
 }
+
+// --- 2.0 additions (Phase 4, P1) --------------------------------------------
+
+#[test]
+fn version_flag_prints_the_crate_version() {
+    let env = Env::new();
+    let (code, out, _) = env.wt(&env.root, &["--version"]);
+    assert_eq!(code, 0);
+    assert_eq!(out, format!("wt {}\n", env!("CARGO_PKG_VERSION")));
+    // Wrong input: the subcommands do not take it.
+    let (code, _, _) = env.wt(&env.root, &["status", "--version"]);
+    assert_eq!(code, 2);
+}

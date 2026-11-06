@@ -39,7 +39,6 @@ RS_FIXTURE = GOLDEN / "rust-2.0.json"
 EXCEPTIONS: dict[str, tuple[str, str]] = {
     "help-noargs": ("code-only", "help text is rendered by argparse vs clap"),
     "help-flag": ("code-only", "help text is rendered by argparse vs clap"),
-    "usage-version": ("code-only", "usage error wording differs (argparse vs clap); exit 2 kept"),
     "usage-bogus": ("code-only", "usage error wording differs (argparse vs clap); exit 2 kept"),
     "usage-subcommand-prefix": ("code-only", "usage error wording differs; exit 2 kept"),
     "usage-interleaved": ("code-only", "usage error wording differs; exit 2 kept"),
@@ -62,6 +61,7 @@ CHANGED: dict[str, str] = {
     "add-normal-clone": "fix 6: in a regular clone wt add needs an explicit path instead of nesting the worktree inside the checkout",
     "add-glob-branch": "fix 7: branch existence is an exact ref lookup, so ma* no longer matches main",
     "rm-locked-fails": "fix 10: the worktree-removal failure lines are in English like the rest of the output",
+    "usage-version": "P1: wt --version prints wt <version> (1.x had no such option)",
 }
 
 ENV_BASE = {

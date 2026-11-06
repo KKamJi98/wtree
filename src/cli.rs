@@ -18,6 +18,7 @@ use crate::complete;
 #[derive(Debug, Parser)]
 #[command(
     name = "wt",
+    version,
     about = "Git worktree management CLI - manage multiple worktrees from anywhere",
     disable_help_subcommand = true,
     args_override_self = true,
