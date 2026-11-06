@@ -419,6 +419,34 @@ fn broken_pipe_exits_quietly() {
     );
 }
 
+#[cfg(unix)]
+#[test]
+fn broken_pipe_fails_a_command_that_changes_things() {
+    let env = Env::new();
+    let proj = env.layout(&["main"], &["main"]);
+    let wt = |args: &[&str]| {
+        // A pipe whose reader is gone before wt starts: the first write fails.
+        let (reader, writer) = std::io::pipe().unwrap();
+        drop(reader);
+        let mut cmd = Command::cargo_bin("wt").unwrap();
+        env.apply(&mut cmd);
+        cmd.args(args)
+            .current_dir(proj.join("main"))
+            .stdout(writer)
+            .stderr(std::process::Stdio::piped())
+            .output()
+            .unwrap()
+    };
+    let out = wt(&["add", "feat/y"]);
+    assert_eq!(out.status.code(), Some(1));
+    assert!(
+        out.stderr.is_empty(),
+        "{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+    assert_eq!(wt(&["status"]).status.code(), Some(0));
+}
+
 #[test]
 fn completion_offers_worktree_dirs_and_remote_branches() {
     let env = Env::new();
@@ -569,6 +597,29 @@ fn add_in_a_regular_clone_needs_an_explicit_path() {
 }
 
 #[test]
+fn add_in_a_bare_clone_named_dot_git_keeps_the_container_layout() {
+    let env = Env::new();
+    env.layout(&["main", "feat/x"], &[]);
+    let cont = env.root.join("cont");
+    let bare = cont.join(".git");
+    let origin = env.root.join("origin.git");
+    env.git(
+        &env.root,
+        &[
+            "clone",
+            "-q",
+            "--bare",
+            origin.to_str().unwrap(),
+            bare.to_str().unwrap(),
+        ],
+    );
+    env.git(&bare, &["worktree", "add", "-q", "../main", "main"]);
+    let (code, out, err) = env.wt(&cont.join("main"), &["add", "feat/x"]);
+    assert_eq!(code, 0, "{out}{err}");
+    assert!(cont.join("feat-x").is_dir());
+}
+
+#[test]
 fn branch_lookups_are_not_globs() {
     let env = Env::new();
     let proj = env.layout(&["main"], &["main"]);
@@ -577,6 +628,13 @@ fn branch_lookups_are_not_globs() {
     assert_eq!(code, 1, "{out}");
     assert!(out.contains("Branch 'ma*' does not exist"), "{out}");
     assert!(!out.contains("invalid reference: ma*"), "{out}");
+
+    // Nor revisions: "main~1" names no branch, so no detached worktree.
+    env.commit(&proj.join("main"), "b.txt", "second");
+    let (code, out, _) = env.wt(&proj.join("main"), &["add", "main~1"]);
+    assert_ne!(code, 0, "{out}");
+    assert!(out.contains("Branch 'main~1' does not exist"), "{out}");
+    assert!(!proj.join("main~1").exists(), "{out}");
 }
 
 #[test]

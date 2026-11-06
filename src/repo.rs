@@ -238,15 +238,22 @@ pub fn probe_status(wt: &Worktree) -> Status {
     parse_status_v2(&result.stdout)
 }
 
+/// `reference` (a full name such as `refs/heads/main`) exists as a ref.
+/// Unlike `rev-parse --verify` this accepts no revision syntax: `main~1` or
+/// `main^` name no ref.
+fn has_exact_ref(repo: &Path, reference: &str) -> bool {
+    git::run(&["show-ref", "--verify", "--quiet", reference], Some(repo)).ok()
+}
+
 /// `origin/<branch>` exists as a remote-tracking ref. An exact ref lookup:
 /// 1.x used `git branch -r --list`, which treats the name as a glob.
 pub fn has_remote_branch(bare_repo: &Path, branch: &str) -> bool {
-    has_git_ref(bare_repo, &format!("refs/remotes/origin/{branch}"))
+    has_exact_ref(bare_repo, &format!("refs/remotes/origin/{branch}"))
 }
 
 /// Local branch `<branch>` exists (exact ref lookup, not a glob).
 pub fn has_local_branch(bare_repo: &Path, branch: &str) -> bool {
-    has_git_ref(bare_repo, &format!("refs/heads/{branch}"))
+    has_exact_ref(bare_repo, &format!("refs/heads/{branch}"))
 }
 
 /// Default branch name of `origin`.

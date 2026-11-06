@@ -2,12 +2,22 @@
 //!
 //! Every user-facing line goes through [`emit`]. Rust ignores SIGPIPE, so a
 //! closed reader (`wt list | head -1`) surfaces as an `EPIPE` write error; that
-//! is treated as a quiet, successful exit instead of a panic.
+//! ends the process quietly instead of a panic. Read-only commands then exit 0
+//! (see [`read_only`]); everything else exits 1, because it stopped before
+//! finishing what it was asked to change.
 
 use std::io::{self, IsTerminal, Write};
+use std::sync::atomic::{AtomicI32, Ordering};
 use std::sync::OnceLock;
 
 static COLORS: OnceLock<bool> = OnceLock::new();
+static EPIPE_EXIT: AtomicI32 = AtomicI32::new(1);
+
+/// Mark the running command as read-only: a closed stdout then ends it with
+/// exit 0, the way `wt list | head -1` should.
+pub fn read_only() {
+    EPIPE_EXIT.store(0, Ordering::Relaxed);
+}
 
 /// Decide once whether ANSI colors are used: off when `NO_COLOR` is set (even
 /// to an empty string) or stdout is not a terminal.
@@ -47,7 +57,7 @@ pub fn colorize(text: &str, color: &str) -> String {
 fn handle(result: io::Result<()>) {
     if let Err(err) = result {
         if err.kind() == io::ErrorKind::BrokenPipe {
-            std::process::exit(0);
+            std::process::exit(EPIPE_EXIT.load(Ordering::Relaxed));
         }
         // Nothing sensible can be printed when stdout itself is broken.
         std::process::exit(1);

@@ -86,7 +86,7 @@ App execution aliases) or call the binary by full path.
 | `json.rs` | `json.dumps`-compatible writer (`ensure_ascii`, separators) |
 | `fnmatch.rs`, `paths.rs` | Python `fnmatch` and `pathlib` behaviour |
 | `complete.rs` | dynamic completion candidates |
-| `out.rs` | stdout writing (EPIPE -> quiet exit 0), colors |
+| `out.rs` | stdout writing (EPIPE -> quiet exit: 0 for `list`/`status`, 1 otherwise), colors |
 
 ### Parity harness
 
@@ -98,6 +98,9 @@ and config) for every case and runs Python 1.2.2 and the Rust binary in it:
 - `tests/golden/python-1.2.2.json` is the recorded Python output (Mac,
   git 2.56.0). CI compares against a live Python 1.2.2 run on the same runner,
   so git-version-dependent text cannot cause false failures.
+- `normalise` replaces the scenario root, curl's `after N ms` timing and the
+  curl transport error after `unable to access '<url>':`, whose wording differs
+  between the macOS and Linux runners.
 - Exceptions (`EXCEPTIONS` in the script) compare the exit code only: help
   text and usage-error wording (exit 2 kept). At the end of Phase 1 the list
   also held `--version` and the 1.x traceback for `wt init <url> <file>`;
@@ -110,7 +113,7 @@ effect, verified separately:
 
 | Situation | 1.x | 2.0 |
 |---|---|---|
-| stdout closed early (`wt list \| true`) | `BrokenPipeError` message, exit 120 | silent, exit 0 (`tests/cli.rs`) |
+| stdout closed early (`wt list \| true`) | `BrokenPipeError` message, exit 120 | silent; exit 0 for `list`, `status` and help, exit 1 for every command that changes something, because it stopped before finishing (`tests/cli.rs`) |
 | Ctrl-C | `KeyboardInterrupt` traceback, exit 130 | default SIGINT, exit 130, no traceback |
 | git missing / non-UTF-8 git output | traceback, exit 1 | `Error: ...` on stderr, exit 1 |
 | colors | only on a TTY, off when `NO_COLOR` is set (even empty) | same (`out.rs`) |
@@ -173,8 +176,8 @@ One commit per bug, each with a test that failed before the fix.
 | 3 | default branch `release/2026` became `2026` and `wt init` failed | full branch name kept; worktree dir `release-2026` |
 | 4 | a failed `wt init` left `<path>/.bare`, blocking a retry | only what the run created is removed |
 | 5 | `wt init <url> <file>` crashed with `NotADirectoryError` | `Error: '<path>' exists and is not a directory.` |
-| 6 | in a regular clone, `wt add` nested the worktree inside the checkout | an explicit path is required there |
-| 7 | `wt add 'ma*'` thought the branch existed (`git branch --list` glob) | exact ref lookups |
+| 6 | in a regular clone, `wt add` nested the worktree inside the checkout | an explicit path is required there (a bare clone named `.git` keeps the default path) |
+| 7 | `wt add 'ma*'` thought the branch existed (`git branch --list` glob) | exact ref lookups (`show-ref --verify`; revisions such as `main~1` name no branch) |
 | 8 | `wt init git@host:repo.git` created `git@host:repo` | directory `repo` |
 | 9 | `wt init https://user:token@...` printed the token | userinfo shown as `***` |
 | 10 | two `wt rm` failure lines were Korean | English like the rest |
@@ -225,3 +228,26 @@ Cases still compared on exit code only: `help-noargs`, `help-flag`,
   reported the binary as fresh although `src/` had changed. `cargo clean -p
   kkamji-wtree` fixed it; the CI MSRV job runs the dry run in a throwaway
   checkout, so CI is not affected.
+
+## Final review
+
+An independent review of the whole diff (2026-11-07) found four defects, fixed
+with tests in `tests/cli.rs` before the merge:
+
+- `wt add` rejected a bare clone named `.git` as a regular clone (fix 6 was too
+  broad). A regular clone is now recognised by its index file.
+- Branch lookups used `rev-parse --verify`, which accepts revisions:
+  `wt add 'main~1'` created a detached worktree. They now use
+  `show-ref --verify`.
+- `render-formula.sh` computed checksums inside the heredoc, where a failure
+  does not stop the script, so a missing `.sha256` produced `sha256 ""` and
+  exit 0. Checksums are now read before rendering.
+- A closed stdout ended every command with exit 0, so `wt rm -y ... | head`
+  reported success although it stopped before removing anything. Only
+  read-only commands exit 0 now.
+
+Known limitation, not fixed: if git itself fails unexpectedly (non-UTF-8
+output, the working directory disappears) during `wt init` after the clone,
+`wt` ends with `Error:` and exit 1 without the cleanup of fix 4, and the new
+`.bare` stays behind. Normal git failures (`clone`, `fetch`, `worktree add`
+returning non-zero) still clean up.

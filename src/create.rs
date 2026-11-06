@@ -322,8 +322,12 @@ pub fn cmd_add(
 ) -> i32 {
     // In a regular clone the common dir is <repo>/.git, and its parent is the
     // main working tree: the default location would nest the new worktree
-    // inside the checkout. Only the .bare layout has a container parent.
-    if path.is_none() && bare_repo.file_name().is_some_and(|n| n == ".git") {
+    // inside the checkout. A bare clone named `.git` (`git clone --bare <url>
+    // proj/.git`) has no index of its own and keeps the container layout.
+    if path.is_none()
+        && bare_repo.file_name().is_some_and(|n| n == ".git")
+        && bare_repo.join("index").is_file()
+    {
         say_err!(
             "Error: '{}' is a regular clone, not a .bare layout; the default path would be inside its working tree.",
             bare_repo.parent().unwrap_or(bare_repo).display()

@@ -126,5 +126,11 @@ fn main() {
     let raw: Vec<std::ffi::OsString> = std::env::args_os().collect();
     let cli = Cli::parse_from(&raw);
     cli::check_positional_runs(&raw);
+    if matches!(
+        cli.command,
+        None | Some(Command::List { .. } | Command::Status { .. })
+    ) {
+        out::read_only();
+    }
     std::process::exit(run(cli));
 }
