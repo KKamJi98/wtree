@@ -425,9 +425,11 @@ fn broken_pipe_fails_a_command_that_changes_things() {
     let env = Env::new();
     let proj = env.layout(&["main"], &["main"]);
     let wt = |args: &[&str]| {
-        // A pipe whose reader is gone before wt starts: the first write fails.
-        let (reader, writer) = std::io::pipe().unwrap();
+        // A socket whose peer is gone before wt starts: the first write fails
+        // with EPIPE. (std::io::pipe would need Rust 1.87; the MSRV is 1.85.)
+        let (writer, reader) = std::os::unix::net::UnixStream::pair().unwrap();
         drop(reader);
+        let writer = std::os::fd::OwnedFd::from(writer);
         let mut cmd = Command::cargo_bin("wt").unwrap();
         env.apply(&mut cmd);
         cmd.args(args)
