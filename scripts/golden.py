@@ -48,7 +48,14 @@ EXCEPTIONS: dict[str, tuple[str, str]] = {
 }
 
 # Filled in as Phase 3/4 changes land: case id -> reason.
-CHANGED: dict[str, str] = {}
+CHANGED: dict[str, str] = {
+    "abbrev-long-json": "fix 1: --json prints only JSON (no Bare repo header)",
+    "status-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)",
+    "status-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
+    "list-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)",
+    "list-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
+    "list-json-korean": "fix 1: --json prints only JSON (no Bare repo header)",
+}
 
 ENV_BASE = {
     "GIT_AUTHOR_NAME": "Golden",

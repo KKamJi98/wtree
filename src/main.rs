@@ -53,13 +53,20 @@ fn run(cli: Cli) -> i32 {
         return 1;
     };
 
-    say!(
-        "{}Bare repo:{} {}",
-        bold(),
-        reset(),
-        paths::display(&bare_repo.to_string_lossy())
+    // With --json, stdout carries the JSON document and nothing else.
+    let json_output = matches!(
+        command,
+        Command::Status { json_output: true } | Command::List { json_output: true }
     );
-    say!();
+    if !json_output {
+        say!(
+            "{}Bare repo:{} {}",
+            bold(),
+            reset(),
+            paths::display(&bare_repo.to_string_lossy())
+        );
+        say!();
+    }
 
     match command {
         Command::Status { json_output } => commands::cmd_status(&bare_repo, json_output),

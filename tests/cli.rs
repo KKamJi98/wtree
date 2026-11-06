@@ -445,3 +445,15 @@ fn completion_offers_worktree_dirs_and_remote_branches() {
     assert_eq!(complete(&["wt", "rm", "LOG"]), ["feat-login"]);
     assert_eq!(complete(&["wt", "add", "-b", "st"]), ["staging"]);
 }
+
+// --- 2.0 fixes (docs/rust-migration.md, Phase 3) ---------------------------
+
+#[test]
+fn json_output_is_only_json() {
+    let env = Env::new();
+    let proj = env.layout(&["main"], &["main"]);
+    let (_, out, _) = env.wt(&proj.join("main"), &["status", "--json"]);
+    assert!(out.starts_with('{') && out.ends_with("}\n"), "{out}");
+    let (_, out, _) = env.wt(&proj.join("main"), &["list", "--json"]);
+    assert!(out.starts_with('[') && out.ends_with("]\n"), "{out}");
+}

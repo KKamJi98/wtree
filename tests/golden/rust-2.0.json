@@ -1,0 +1,66 @@
+{
+  "cases": {
+    "abbrev-long-json": {
+      "argv": [
+        "st",
+        "--js"
+      ],
+      "code": 0,
+      "stderr": "",
+      "stdout": "{\n  \"worktrees\": [\n    {\n      \"branch\": \"feat/login\",\n      \"path\": \"<ROOT>/proj/feat-login\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"feat/x\",\n      \"path\": \"<ROOT>/proj/feat-x\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"hotfix\",\n      \"path\": \"<ROOT>/proj/hotfix\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"main\",\n      \"path\": \"<ROOT>/proj/main\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"staging\",\n      \"path\": \"<ROOT>/proj/staging\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    }\n  ],\n  \"summary\": {\n    \"total\": 5,\n    \"clean\": 5,\n    \"dirty\": 0\n  }\n}\n"
+    },
+    "list-json-empty": {
+      "argv": [
+        "list",
+        "--json"
+      ],
+      "code": 1,
+      "stderr": "",
+      "stdout": "[]\n"
+    },
+    "list-json-korean": {
+      "argv": [
+        "list",
+        "--json"
+      ],
+      "code": 0,
+      "stderr": "",
+      "stdout": "[\n  {\n    \"branch\": \"main\",\n    \"path\": \"<ROOT>/proj/main\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"\\uae30\\ub2a5/\\ud55c\\uae00\",\n    \"path\": \"<ROOT>/proj/\\uae30\\ub2a5-\\ud55c\\uae00\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  }\n]\n"
+    },
+    "list-json-mixed": {
+      "argv": [
+        "list",
+        "--json"
+      ],
+      "code": 0,
+      "stderr": "",
+      "stdout": "[\n  {\n    \"branch\": \"(detached 20ed2fdc)\",\n    \"path\": \"<ROOT>/proj/det\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": true\n  },\n  {\n    \"branch\": \"feat/login\",\n    \"path\": \"<ROOT>/proj/feat-login\",\n    \"commit\": \"29f93996\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"feat/x\",\n    \"path\": \"<ROOT>/proj/feat-x\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"hotfix\",\n    \"path\": \"<ROOT>/proj/hotfix\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"local-only\",\n    \"path\": \"<ROOT>/proj/local-only\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"main\",\n    \"path\": \"<ROOT>/proj/main\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"staging\",\n    \"path\": \"<ROOT>/proj/staging\",\n    \"commit\": \"b5cf1aa7\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"upstream-me\",\n    \"path\": \"<ROOT>/proj/upstream-me\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  }\n]\n"
+    },
+    "status-json-empty": {
+      "argv": [
+        "status",
+        "--json"
+      ],
+      "code": 1,
+      "stderr": "",
+      "stdout": "{\"worktrees\": [], \"summary\": {\"total\": 0, \"clean\": 0, \"dirty\": 0}}\n"
+    },
+    "status-json-mixed": {
+      "argv": [
+        "status",
+        "--json"
+      ],
+      "code": 2,
+      "stderr": "",
+      "stdout": "{\n  \"worktrees\": [\n    {\n      \"branch\": \"(detached 20ed2fdc)\",\n      \"path\": \"<ROOT>/proj/det\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"detached\",\n      \"detached\": true\n    },\n    {\n      \"branch\": \"feat/login\",\n      \"path\": \"<ROOT>/proj/feat-login\",\n      \"commit\": \"29f93996\",\n      \"status\": \"clean\",\n      \"sync\": \"\\u21911 \\u21931\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"feat/x\",\n      \"path\": \"<ROOT>/proj/feat-x\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"dirty\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"hotfix\",\n      \"path\": \"<ROOT>/proj/hotfix\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"dirty\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"local-only\",\n      \"path\": \"<ROOT>/proj/local-only\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"no upstream\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"main\",\n      \"path\": \"<ROOT>/proj/main\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"\\u21931\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"staging\",\n      \"path\": \"<ROOT>/proj/staging\",\n      \"commit\": \"b5cf1aa7\",\n      \"status\": \"clean\",\n      \"sync\": \"\\u21911\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"upstream-me\",\n      \"path\": \"<ROOT>/proj/upstream-me\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"no upstream\",\n      \"detached\": false\n    }\n  ],\n  \"summary\": {\n    \"total\": 8,\n    \"clean\": 6,\n    \"dirty\": 2\n  }\n}\n"
+    }
+  },
+  "reasons": {
+    "abbrev-long-json": "fix 1: --json prints only JSON (no Bare repo header)",
+    "list-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
+    "list-json-korean": "fix 1: --json prints only JSON (no Bare repo header)",
+    "list-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)",
+    "status-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
+    "status-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)"
+  }
+}
