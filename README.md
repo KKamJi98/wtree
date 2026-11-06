@@ -149,6 +149,12 @@ wt remove --match "feat/*" --dry-run
 wt remove staging -f
 ```
 
+An identifier is matched as an exact branch name or path first, then as a
+worktree directory name, then as trailing path components (`proj/main`), never
+as a partial word. When one identifier still matches several worktrees (two
+directories called `api`, say), `wt remove` stops and lists them, even with
+`-y`; name one by path, or pass `--all-matches` to remove them all.
+
 `wt remove` takes the worktree entry and its directory, and nothing else. Pass
 `-b/--branch` to delete the local branch too, and `--remote` on top of that to
 delete the remote one. `--remote` without `-b` is an error rather than a
@@ -176,7 +182,13 @@ wt upstream                   # only if it has no upstream yet
 ```bash
 wt status
 wt st
+
+# Machine-readable: stdout carries only the JSON document
+wt status --json | jq '.worktrees[] | select(.status == "dirty") | .path'
 ```
+
+Each worktree reports `status` (clean/dirty), `sync` (ahead/behind),
+`upstream` (the tracked ref, or `null`) and `detached`.
 
 ### Sync
 
@@ -246,11 +258,11 @@ To add more worktrees:
 ```
 Bare repo: /path/to/repo/.bare
 
-STATUS   BRANCH                    SYNC           PATH
--------- ------------------------- -------------- ----------------------------------------
-CLEAN    main                      =              /path/to/repo/main
-CLEAN    staging                   ↓3             /path/to/repo/staging
-DIRTY    feat/new-feature          ↑2             /path/to/repo/feat-new-feature
+STATUS   BRANCH           SYNC           UPSTREAM                PATH
+-------- ---------------- -------------- ----------------------- ------------------------------
+CLEAN    main             =              origin/main             /path/to/repo/main
+CLEAN    staging          ↓3             origin/staging          /path/to/repo/staging
+DIRTY    feat/new-feature ↑2             origin/feat/new-feature /path/to/repo/feat-new-feature
 
 Summary: total=3 clean=2 dirty=1
 ```
@@ -332,6 +344,8 @@ git worktree add ../staging staging
 | `wt pull --rebase` | `p -r` | Fetch, then rebase |
 | `wt list` | `ls` | List worktrees |
 | `wt upstream` | `up` | Set the missing upstreams |
+| `wt prune [--dry-run]` | - | Remove stale worktree references |
+| `wt --version` | - | Print the version |
 
 ## Exit Codes
 
@@ -346,6 +360,9 @@ git worktree add ../staging staging
 `status` returns `2` when any worktree is dirty, and `remove` returns `2` when it
 kept a branch it was asked to delete. A command line that cannot be parsed
 (unknown option, missing argument) also exits `2`.
+
+`Error:` messages go to stderr; progress lines, results and summaries go to
+stdout.
 
 ## Requirements
 

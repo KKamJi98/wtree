@@ -90,17 +90,20 @@ App execution aliases) or call the binary by full path.
 
 ### Parity harness
 
-`scripts/golden.py` builds 73 deterministic scenarios (fixed author, dates and
-config) and runs Python 1.2.2 and the Rust binary in each:
+`scripts/golden.py` builds a fresh deterministic scenario (fixed author, dates
+and config) for every case and runs Python 1.2.2 and the Rust binary in it:
 
-- 66 command cases (stdout, stderr, exit code) and 7 completion cases
+- 68 command cases (stdout, stderr, exit code) and 7 completion cases
   (candidate sets).
 - `tests/golden/python-1.2.2.json` is the recorded Python output (Mac,
   git 2.56.0). CI compares against a live Python 1.2.2 run on the same runner,
   so git-version-dependent text cannot cause false failures.
 - Exceptions (`EXCEPTIONS` in the script) compare the exit code only: help
-  text, usage-error wording (exit 2 kept) and the 1.x traceback for
-  `wt init <url> <existing file>`.
+  text and usage-error wording (exit 2 kept). At the end of Phase 1 the list
+  also held `--version` and the 1.x traceback for `wt init <url> <file>`;
+  both became intentional changes later (see the table below).
+- At the end of Phase 1 every case matched 1.2.2 outside the exceptions, on
+  macOS locally and on the ubuntu and macos CI runners.
 
 Not covered by the harness because the 1.x output is a crash or a terminal
 effect, verified separately:
@@ -138,9 +141,87 @@ The pytest fakes at `tests/test_commands.py:497` and `:556` created
 `feat/from-main` and `feat/from-staging` in the current directory (they treated
 the branch argument as the path). They are not ported.
 
+## Phase 2: CI and release
+
+- `ci.yml`: `cargo fmt --check`, `cargo clippy --all-targets -- -D warnings` and
+  `cargo test --locked` on ubuntu, macos and windows; the golden harness live on
+  ubuntu and macos; `cargo-deny` (`deny.toml`); an MSRV job (Rust 1.85, the
+  `rust-version` of clap 4.6) that also runs `cargo publish --dry-run`.
+- `release.yml` on `v*` tags: Cargo.toml/tag guard (replaces the
+  `uv version --short` guard), five targets, `SHA256SUMS` plus build provenance
+  attestation, GitHub Release, crates.io through Trusted Publishing in the
+  `release` environment, and `Formula/wtree.rb` pushed to
+  `KKamJi98/homebrew-tap` with the repository's `HOMEBREW_TAP_DEPLOY_KEY`
+  deploy key (`scripts/release/render-formula.sh`, `conflicts_with` worktrunk
+  and wiredtiger).
+- All actions are pinned to commit SHAs; every workflow starts from
+  `permissions: {}`.
+- The crates.io job skips while the crate does not exist yet: Trusted
+  Publishing can only be configured for an existing crate, so 2.0.0 is
+  published by hand from the tagged commit.
+- Removed: the Python package, its tests, `pyproject.toml`, `uv.lock` and the
+  PyPI publish job. The `pypi` environment and PyPI releases stay.
+
+## Phase 3: bug fixes
+
+One commit per bug, each with a test that failed before the fix.
+
+| # | 1.x behaviour | 2.0 |
+|---|---|---|
+| 1 | `status --json`, `list --json` started with the `Bare repo:` header, so the output was not JSON | stdout carries only the JSON document |
+| 2 | `wt rm in` matched `main` and `feat-login` (string suffix) | suffixes match whole trailing path components |
+| 3 | default branch `release/2026` became `2026` and `wt init` failed | full branch name kept; worktree dir `release-2026` |
+| 4 | a failed `wt init` left `<path>/.bare`, blocking a retry | only what the run created is removed |
+| 5 | `wt init <url> <file>` crashed with `NotADirectoryError` | `Error: '<path>' exists and is not a directory.` |
+| 6 | in a regular clone, `wt add` nested the worktree inside the checkout | an explicit path is required there |
+| 7 | `wt add 'ma*'` thought the branch existed (`git branch --list` glob) | exact ref lookups |
+| 8 | `wt init git@host:repo.git` created `git@host:repo` | directory `repo` |
+| 9 | `wt init https://user:token@...` printed the token | userinfo shown as `***` |
+| 10 | two `wt rm` failure lines were Korean | English like the rest |
+
+## Phase 4: P1 additions
+
+- `wt --version` (`wt 2.0.0`).
+- `Error:` messages on stderr; progress and results stay on stdout.
+- `wt rm`: an identifier that matches several worktrees needs `--all-matches`,
+  even with `-y`; `--dry-run` previews with a warning.
+- `wt status`: `UPSTREAM` column and `upstream` JSON field.
+- P2/P3 ideas are recorded in `docs/ROADMAP.md`, not implemented.
+
+## Golden differences from 1.2.2
+
+Cases that intentionally differ from Python 1.2.2 (`CHANGED` in
+`scripts/golden.py`); the 2.0 output is recorded in `tests/golden/rust-2.0.json`.
+
+| Case | Reason |
+|---|---|
+| `abbrev-long-json`, `status-json-mixed` | fix 1, plus the P1 `upstream` field |
+| `status-json-empty`, `list-json-mixed`, `list-json-empty`, `list-json-korean` | fix 1 |
+| `rm-suffix-in` | fix 2 (error now on stderr) |
+| `init-release-default` | fix 3 |
+| `init-clone-fails` | fix 4 |
+| `init-credential-url` | fixes 4 and 9 |
+| `init-into-file` | fix 5 (error on stderr) |
+| `add-normal-clone` | fix 6 (error on stderr) |
+| `add-glob-branch` | fix 7 |
+| `rm-locked-fails` | fix 10 |
+| `usage-version` | P1 `--version` |
+| `not-a-repo`, `add-path-exists`, `rm-no-match`, `rm-no-args`, `rm-remote-without-b`, `init-nonempty-dir` | P1 errors on stderr |
+| `status-std`, `status-mixed`, `status-korean`, `status-normal-clone` | P1 `UPSTREAM` column |
+
+Cases still compared on exit code only: `help-noargs`, `help-flag`,
+`usage-bogus`, `usage-subcommand-prefix`, `usage-interleaved`,
+`usage-add-missing`.
+
 ## Differences from the plan
 
 - Worktree path: the plan named `/Users/ethan/code/code-personal/wtree-rust-rewrite`.
   The local Git workflow rules forbid sibling worktrees outside the repository
   directory, so the work happened in `wtree/feat-rust-rewrite` instead (the
   same layout prjump used).
+- Local pitfall: `cargo publish --dry-run` verifies the package in
+  `target/package/`, and on cargo 1.99 it rewrote the dev fingerprint of the
+  `wt` binary to point at the packaged sources. Later `cargo build` runs then
+  reported the binary as fresh although `src/` had changed. `cargo clean -p
+  kkamji-wtree` fixed it; the CI MSRV job runs the dry run in a throwaway
+  checkout, so CI is not affected.
