@@ -137,6 +137,16 @@
       "stderr": "",
       "stdout": "Initializing worktree repository\n  URL:    <ROOT>/missing.git\n  Path:   <ROOT>/bad\n\nStep 1: Clone bare repository\n  FAIL git clone --bare failed\n  fatal: repository '<ROOT>/missing.git' does not exist\n"
     },
+    "init-credential-url": {
+      "argv": [
+        "init",
+        "https://user:SECRET-TOKEN@127.0.0.1:9/x.git",
+        "cred"
+      ],
+      "code": 1,
+      "stderr": "",
+      "stdout": "Initializing worktree repository\n  URL:    https://user:SECRET-TOKEN@127.0.0.1:9/x.git\n  Path:   <ROOT>/cred\n\nStep 1: Clone bare repository\n  FAIL git clone --bare failed\n  Cloning into bare repository '<ROOT>/cred/.bare'...\nfatal: unable to access 'https://127.0.0.1:9/x.git/': Failed to connect to 127.0.0.1:9 after N ms: Could not connect to server\n"
+    },
     "init-default-name": {
       "argv": [
         "init",
@@ -412,6 +422,17 @@
       "code": 0,
       "stderr": "",
       "stdout": "Bare repo: <ROOT>/proj/.bare\n\nMatched worktrees: 1\n  feat/x                          <ROOT>/proj/feat-x\n\nRemoving worktree: feat/x\n  Path: <ROOT>/proj/feat-x\n  OK removed worktree\n\nSummary: ok=1 skip=0 kept=0 fail=0\n"
+    },
+    "rm-locked-fails": {
+      "argv": [
+        "rm",
+        "-y",
+        "-b",
+        "hotfix"
+      ],
+      "code": 2,
+      "stderr": "",
+      "stdout": "Bare repo: <ROOT>/proj/.bare\n\nMatched worktrees: 1\n  hotfix                          <ROOT>/proj/hotfix\n\nRemoving worktree: hotfix\n  Path: <ROOT>/proj/hotfix\n  FAIL worktree 제거 실패: fatal: cannot remove a locked working tree;\nuse 'remove -f -f' to override or unlock first\n  SKIP worktree 제거 실패로 branch 삭제를 건너뜁니다 (hotfix)\n\nSummary: ok=0 skip=0 kept=0 fail=1\n"
     },
     "rm-match-dry-run": {
       "argv": [

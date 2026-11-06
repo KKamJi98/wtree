@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shlex
 import shutil
 import subprocess
@@ -246,6 +247,13 @@ def sc_stale(s: Scene) -> Path:
     return proj
 
 
+def sc_locked(s: Scene) -> Path:
+    """A locked worktree: `git worktree remove` refuses it without -f -f."""
+    proj = sc_std(s)
+    s.git("worktree", "lock", str(proj / "hotfix"), cwd=proj / ".bare")
+    return proj
+
+
 SCENES = {
     "std": sc_std,
     "mixed": sc_mixed,
@@ -256,6 +264,7 @@ SCENES = {
     "release": sc_release,
     "merged": sc_merged,
     "stale": sc_stale,
+    "locked": sc_locked,
 }
 
 # --- cases -----------------------------------------------------------------
@@ -349,6 +358,7 @@ CASES: list[tuple[str, str, str, list[str], str | None]] = [
     ),
     ("rm-branch-remote-yes", "merged", "main", ["rm", "-y", "-b", "--remote", "done", "wip"], None),
     ("rm-branch-force", "merged", "main", ["rm", "-y", "-f", "-b", "wip"], None),
+    ("rm-locked-fails", "locked", "main", ["rm", "-y", "-b", "hotfix"], None),
     # init
     ("init-basic", "origin", ".", ["init", "file://{root}/origin.git", "target"], None),
     (
@@ -364,6 +374,14 @@ CASES: list[tuple[str, str, str, list[str], str | None]] = [
     ("init-nonempty-dir", "origin", ".", ["init", "{root}/origin.git", "src"], None),
     ("init-into-file", "origin", ".", ["init", "{root}/origin.git", "src/a.txt"], None),
     ("init-clone-fails", "origin", ".", ["init", "{root}/missing.git", "bad"], None),
+    # Port 9 (discard) on localhost refuses at once; no network is used.
+    (
+        "init-credential-url",
+        "origin",
+        ".",
+        ["init", "https://user:SECRET-TOKEN@127.0.0.1:9/x.git", "cred"],
+        None,
+    ),
 ]
 
 # Completion: (id, scene, cwd, command line). Compared as candidate sets of
@@ -384,7 +402,8 @@ ALIASES = {"a", "rm", "st", "f", "p", "ls", "up", "help"}
 def normalise(text: str, root: Path) -> str:
     for variant in {str(root), str(root.resolve()), "/private" + str(root)}:
         text = text.replace(variant, "<ROOT>")
-    return text
+    # curl reports how long a refused connection took.
+    return re.sub(r"after \d+ ms", "after N ms", text)
 
 
 def build(scene: str, base: Path) -> tuple[Scene, Path]:
