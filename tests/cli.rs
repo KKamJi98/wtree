@@ -501,3 +501,31 @@ fn init_keeps_a_default_branch_with_a_slash() {
     let up = env.git(&wt, &["rev-parse", "--abbrev-ref", "@{u}"]);
     assert_eq!(up.trim(), "origin/release/2026");
 }
+
+#[test]
+fn failed_init_removes_only_what_it_created() {
+    let env = Env::new();
+    let missing = env.root.join("missing.git");
+    let (code, out, _) = env.wt(&env.root, &["init", missing.to_str().unwrap(), "bad"]);
+    assert_eq!(code, 1, "{out}");
+    assert!(
+        !env.root.join("bad").exists(),
+        "new directory is removed\n{out}"
+    );
+
+    // A directory that existed (empty) before is kept, and left empty.
+    fs::create_dir(env.root.join("keep")).unwrap();
+    let (code, out, _) = env.wt(&env.root, &["init", missing.to_str().unwrap(), "keep"]);
+    assert_eq!(code, 1, "{out}");
+    assert!(env.root.join("keep").is_dir());
+    assert_eq!(
+        fs::read_dir(env.root.join("keep")).unwrap().count(),
+        0,
+        "{out}"
+    );
+
+    // So the same command can simply be run again.
+    let (code, out, _) = env.wt(&env.root, &["init", missing.to_str().unwrap(), "bad"]);
+    assert_eq!(code, 1);
+    assert!(!out.contains("already exists"), "{out}");
+}

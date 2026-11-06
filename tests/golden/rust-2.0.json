@@ -9,6 +9,26 @@
       "stderr": "",
       "stdout": "{\n  \"worktrees\": [\n    {\n      \"branch\": \"feat/login\",\n      \"path\": \"<ROOT>/proj/feat-login\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"feat/x\",\n      \"path\": \"<ROOT>/proj/feat-x\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"hotfix\",\n      \"path\": \"<ROOT>/proj/hotfix\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"main\",\n      \"path\": \"<ROOT>/proj/main\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"staging\",\n      \"path\": \"<ROOT>/proj/staging\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    }\n  ],\n  \"summary\": {\n    \"total\": 5,\n    \"clean\": 5,\n    \"dirty\": 0\n  }\n}\n"
     },
+    "init-clone-fails": {
+      "argv": [
+        "init",
+        "<ROOT>/missing.git",
+        "bad"
+      ],
+      "code": 1,
+      "stderr": "",
+      "stdout": "Initializing worktree repository\n  URL:    <ROOT>/missing.git\n  Path:   <ROOT>/bad\n\nStep 1: Clone bare repository\n  FAIL git clone --bare failed\n  fatal: repository '<ROOT>/missing.git' does not exist\n  INFO removed the partial setup in <ROOT>/bad\n"
+    },
+    "init-credential-url": {
+      "argv": [
+        "init",
+        "https://user:SECRET-TOKEN@127.0.0.1:9/x.git",
+        "cred"
+      ],
+      "code": 1,
+      "stderr": "",
+      "stdout": "Initializing worktree repository\n  URL:    https://user:SECRET-TOKEN@127.0.0.1:9/x.git\n  Path:   <ROOT>/cred\n\nStep 1: Clone bare repository\n  FAIL git clone --bare failed\n  Cloning into bare repository '<ROOT>/cred/.bare'...\nfatal: unable to access 'https://127.0.0.1:9/x.git/': Failed to connect to 127.0.0.1:9 after N ms: Could not connect to server\n  INFO removed the partial setup in <ROOT>/cred\n"
+    },
     "init-release-default": {
       "argv": [
         "init",
@@ -77,6 +97,8 @@
   },
   "reasons": {
     "abbrev-long-json": "fix 1: --json prints only JSON (no Bare repo header)",
+    "init-clone-fails": "fix 4: a failed init removes the directory it created",
+    "init-credential-url": "fix 4: a failed init removes the directory it created",
     "init-release-default": "fix 3: a default branch with a slash (release/2026) is kept whole; its worktree dir is release-2026",
     "list-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-korean": "fix 1: --json prints only JSON (no Bare repo header)",

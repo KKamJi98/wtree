@@ -21,6 +21,41 @@ fn dir_is_nonempty(path: &Path) -> bool {
     }
 }
 
+/// Undo a failed `wt init`. A directory `wt init` created is removed; one that
+/// already existed was empty (checked before cloning), so only its contents,
+/// all created by this run, are removed.
+fn clean_up_failed_init(target: &Path, existed: bool) {
+    let result = if existed {
+        std::fs::read_dir(target).and_then(|entries| {
+            for entry in entries {
+                let path = entry?.path();
+                if path.is_dir() {
+                    std::fs::remove_dir_all(&path)?;
+                } else {
+                    std::fs::remove_file(&path)?;
+                }
+            }
+            Ok(())
+        })
+    } else {
+        std::fs::remove_dir_all(target)
+    };
+    match result {
+        Ok(()) => say!(
+            "  {}INFO{} removed the partial setup in {}",
+            blue(),
+            reset(),
+            target.display()
+        ),
+        Err(err) => say!(
+            "  {}WARN{} could not remove the partial setup in {}: {err}",
+            yellow(),
+            reset(),
+            target.display()
+        ),
+    }
+}
+
 fn set_upstream(branch: &str, cwd: &Path) -> bool {
     let target = format!("origin/{branch}");
     git::run(
@@ -55,6 +90,7 @@ pub fn cmd_init(repo_url: &str, path: Option<&str>, worktrees: Option<&[String]>
     say!();
 
     say!("{}Step 1:{} Clone bare repository", bold(), reset());
+    let existed = target.exists();
     if let Err(err) = std::fs::create_dir_all(&target) {
         fatal(&format!("cannot create '{}': {err}", target.display()));
     }
@@ -64,6 +100,7 @@ pub fn cmd_init(repo_url: &str, path: Option<&str>, worktrees: Option<&[String]>
         if !result.stderr.is_empty() {
             say!("  {}", result.stderr.trim());
         }
+        clean_up_failed_init(&target, existed);
         return 1;
     }
     say!("  {}OK{} cloned to {}", green(), reset(), bare.display());
@@ -118,6 +155,7 @@ pub fn cmd_init(repo_url: &str, path: Option<&str>, worktrees: Option<&[String]>
         if !result.stderr.is_empty() {
             say!("  {}", result.stderr.trim());
         }
+        clean_up_failed_init(&target, existed);
         return 1;
     }
     say!(
