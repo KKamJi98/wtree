@@ -60,6 +60,7 @@ CHANGED: dict[str, str] = {
     "init-credential-url": "fix 4: a failed init removes the directory it created",
     "init-into-file": "fix 5: a file at the target path is a clear error instead of a NotADirectoryError traceback",
     "add-normal-clone": "fix 6: in a regular clone wt add needs an explicit path instead of nesting the worktree inside the checkout",
+    "add-glob-branch": "fix 7: branch existence is an exact ref lookup, so ma* no longer matches main",
 }
 
 ENV_BASE = {

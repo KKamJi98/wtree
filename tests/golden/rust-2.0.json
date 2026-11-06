@@ -9,6 +9,15 @@
       "stderr": "",
       "stdout": "{\n  \"worktrees\": [\n    {\n      \"branch\": \"feat/login\",\n      \"path\": \"<ROOT>/proj/feat-login\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"feat/x\",\n      \"path\": \"<ROOT>/proj/feat-x\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"hotfix\",\n      \"path\": \"<ROOT>/proj/hotfix\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"main\",\n      \"path\": \"<ROOT>/proj/main\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"staging\",\n      \"path\": \"<ROOT>/proj/staging\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    }\n  ],\n  \"summary\": {\n    \"total\": 5,\n    \"clean\": 5,\n    \"dirty\": 0\n  }\n}\n"
     },
+    "add-glob-branch": {
+      "argv": [
+        "add",
+        "ma*"
+      ],
+      "code": 1,
+      "stderr": "",
+      "stdout": "Bare repo: <ROOT>/proj/.bare\n\nNote: Branch 'ma*' does not exist. Creating new branch.\nAdding worktree for branch: ma*\n  Path: <ROOT>/proj/ma*\n\nFAIL Preparing worktree (new branch 'ma*')\nfatal: 'ma*' is not a valid branch name\nhint: See 'git help check-ref-format'\nhint: Disable this message with \"git config set advice.refSyntax false\"\n"
+    },
     "add-normal-clone": {
       "argv": [
         "add",
@@ -116,6 +125,7 @@
   },
   "reasons": {
     "abbrev-long-json": "fix 1: --json prints only JSON (no Bare repo header)",
+    "add-glob-branch": "fix 7: branch existence is an exact ref lookup, so ma* no longer matches main",
     "add-normal-clone": "fix 6: in a regular clone wt add needs an explicit path instead of nesting the worktree inside the checkout",
     "init-clone-fails": "fix 4: a failed init removes the directory it created",
     "init-credential-url": "fix 4: a failed init removes the directory it created",

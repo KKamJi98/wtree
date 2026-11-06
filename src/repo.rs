@@ -244,19 +244,15 @@ pub fn probe_status(wt: &Worktree) -> Status {
     parse_status_v2(&result.stdout)
 }
 
+/// `origin/<branch>` exists as a remote-tracking ref. An exact ref lookup:
+/// 1.x used `git branch -r --list`, which treats the name as a glob.
 pub fn has_remote_branch(bare_repo: &Path, branch: &str) -> bool {
-    let pattern = format!("origin/{branch}");
-    !git::run(&["branch", "-r", "--list", &pattern], Some(bare_repo))
-        .stdout
-        .trim()
-        .is_empty()
+    has_git_ref(bare_repo, &format!("refs/remotes/origin/{branch}"))
 }
 
+/// Local branch `<branch>` exists (exact ref lookup, not a glob).
 pub fn has_local_branch(bare_repo: &Path, branch: &str) -> bool {
-    !git::run(&["branch", "--list", branch], Some(bare_repo))
-        .stdout
-        .trim()
-        .is_empty()
+    has_git_ref(bare_repo, &format!("refs/heads/{branch}"))
 }
 
 /// Default branch name of `origin`.

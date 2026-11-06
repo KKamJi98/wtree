@@ -567,3 +567,14 @@ fn add_in_a_regular_clone_needs_an_explicit_path() {
     assert_eq!(code, 0, "{out}");
     assert!(env.root.join("clone-feat-x").is_dir());
 }
+
+#[test]
+fn branch_lookups_are_not_globs() {
+    let env = Env::new();
+    let proj = env.layout(&["main"], &["main"]);
+    // 1.x passed the name to `git branch --list`, where "ma*" matched main.
+    let (code, out, _) = env.wt(&proj.join("main"), &["add", "ma*"]);
+    assert_eq!(code, 1, "{out}");
+    assert!(out.contains("Branch 'ma*' does not exist"), "{out}");
+    assert!(!out.contains("invalid reference: ma*"), "{out}");
+}
