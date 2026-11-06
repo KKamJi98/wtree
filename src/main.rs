@@ -91,6 +91,7 @@ fn run(cli: Cli) -> i32 {
             branch,
             remote,
             yes,
+            all_matches,
         } => {
             if remote && !branch {
                 say_err!("Error: --remote requires -b/--branch flag");
@@ -106,6 +107,7 @@ fn run(cli: Cli) -> i32 {
                     delete_branch: branch,
                     delete_remote: remote,
                     yes,
+                    all_matches,
                 },
             )
         }

@@ -382,6 +382,7 @@ pub struct RemoveOptions<'a> {
     pub delete_branch: bool,
     pub delete_remote: bool,
     pub yes: bool,
+    pub all_matches: bool,
 }
 
 pub fn cmd_remove(bare_repo: &Path, opts: &RemoveOptions) -> i32 {
@@ -401,10 +402,16 @@ pub fn cmd_remove(bare_repo: &Path, opts: &RemoveOptions) -> i32 {
     let mut missing_ids: Vec<&str> = Vec::new();
     let mut missing_patterns: Vec<&str> = Vec::new();
 
+    // Identifiers that matched more than one worktree (dir name or suffix).
+    let mut ambiguous: Vec<(&str, Vec<&Worktree>)> = Vec::new();
+
     for identifier in opts.identifiers {
         let matches = find_by_identifier(&worktrees, identifier);
         if matches.is_empty() {
             missing_ids.push(identifier);
+        }
+        if matches.len() > 1 {
+            ambiguous.push((identifier, matches.clone()));
         }
         for wt in matches {
             targets.insert(wt.path_str(), wt);
@@ -459,6 +466,33 @@ pub fn cmd_remove(bare_repo: &Path, opts: &RemoveOptions) -> i32 {
         );
     }
     let partial_match = !missing_ids.is_empty() || !missing_patterns.is_empty();
+
+    // One name that resolves to several worktrees is more likely a mistake
+    // than a request; removal needs explicit consent even with -y.
+    if !ambiguous.is_empty() && !opts.all_matches {
+        if opts.dry_run {
+            for (identifier, matches) in &ambiguous {
+                say!(
+                    "{}WARN{} identifier '{identifier}' matches {} worktrees; removing them needs --all-matches",
+                    yellow(),
+                    reset(),
+                    matches.len()
+                );
+            }
+        } else {
+            for (identifier, matches) in &ambiguous {
+                say_err!(
+                    "Error: identifier '{identifier}' matches {} worktrees:",
+                    matches.len()
+                );
+                for wt in matches {
+                    say_err!("  {:<30}  {}", wt.branch, wt.path_str());
+                }
+            }
+            say_err!("  name one worktree by its path, or pass --all-matches to remove them all");
+            return 1;
+        }
+    }
 
     if opts.dry_run {
         let mut default_ref = None;

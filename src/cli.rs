@@ -87,6 +87,9 @@ pub enum Command {
         /// Skip confirmation prompt
         #[arg(short = 'y', long)]
         yes: bool,
+        /// Remove every worktree an identifier matches when it matches several
+        #[arg(long)]
+        all_matches: bool,
     },
 
     /// Show status of all worktrees
@@ -162,7 +165,14 @@ fn long_options(subcommand: &str) -> &'static [&'static str] {
         "init" => &["worktrees", "help"],
         "add" | "a" => &["create", "base", "help"],
         "remove" | "rm" => &[
-            "match", "dry-run", "force", "branch", "remote", "yes", "help",
+            "match",
+            "dry-run",
+            "force",
+            "branch",
+            "remote",
+            "yes",
+            "all-matches",
+            "help",
         ],
         "status" | "st" | "list" | "ls" => &["json", "help"],
         "pull" | "p" => &["rebase", "help"],

@@ -655,3 +655,37 @@ fn errors_go_to_stderr() {
     assert_eq!(code, 0);
     assert!(out.contains("main") && err.is_empty(), "{out}{err}");
 }
+
+#[test]
+fn ambiguous_identifier_needs_all_matches() {
+    let env = Env::new();
+    let proj = env.layout(&["main", "a", "b"], &["main"]);
+    let bare = proj.join(".bare");
+    for (branch, dir) in [("a", "one/api"), ("b", "two/api")] {
+        let path = proj.join(dir);
+        env.git(
+            &bare,
+            &["worktree", "add", "-q", path.to_str().unwrap(), branch],
+        );
+    }
+    let main = proj.join("main");
+
+    // Wrong input for a destructive run: one name, two worktrees.
+    let (code, out, err) = env.wt(&main, &["rm", "-y", "api"]);
+    assert_eq!(code, 1, "{out}{err}");
+    assert!(
+        err.contains("identifier 'api' matches 2 worktrees"),
+        "{err}"
+    );
+    assert!(proj.join("one/api").is_dir() && proj.join("two/api").is_dir());
+
+    // A dry run still previews, with a warning.
+    let (code, out, _) = env.wt(&main, &["rm", "--dry-run", "api"]);
+    assert_eq!(code, 0, "{out}");
+    assert!(out.contains("needs --all-matches"), "{out}");
+
+    // Explicit consent removes both.
+    let (code, out, _) = env.wt(&main, &["rm", "-y", "--all-matches", "api"]);
+    assert_eq!(code, 0, "{out}");
+    assert!(!proj.join("one/api").exists() && !proj.join("two/api").exists());
+}
