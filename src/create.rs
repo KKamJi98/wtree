@@ -96,7 +96,9 @@ pub fn cmd_init(repo_url: &str, path: Option<&str>, worktrees: Option<&[String]>
     let default_branch = repo::get_default_branch(&bare);
     say!("  Default branch: {default_branch}");
 
-    let default_wt = target.join(&default_branch);
+    // A branch like release/2026 gets a flat directory, as with -w.
+    let default_dir = default_branch.replace('/', "-");
+    let default_wt = target.join(&default_dir);
     let default_wt_str = default_wt.to_string_lossy().into_owned();
     let result = git::run(
         &[
@@ -119,7 +121,7 @@ pub fn cmd_init(repo_url: &str, path: Option<&str>, worktrees: Option<&[String]>
         return 1;
     }
     say!(
-        "  {}OK{} created worktree: {default_branch}/",
+        "  {}OK{} created worktree: {default_dir}/",
         green(),
         reset()
     );
@@ -239,7 +241,7 @@ pub fn cmd_init(repo_url: &str, path: Option<&str>, worktrees: Option<&[String]>
     say!("{}✓ Initialization complete!{}", green(), reset());
     say!();
     say!("Next steps:");
-    say!("  cd {}/{default_branch}", target.display());
+    say!("  cd {}/{default_dir}", target.display());
     say!("  wt status");
     say!();
     say!("To add more worktrees:");

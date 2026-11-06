@@ -472,3 +472,32 @@ fn identifier_suffix_matches_whole_path_components_only() {
     assert_eq!(code, 0, "{out}");
     assert!(out.contains("Matched worktrees: 1"), "{out}");
 }
+
+#[test]
+fn init_keeps_a_default_branch_with_a_slash() {
+    let env = Env::new();
+    let src = env.root.join("src");
+    env.git(
+        &env.root,
+        &["init", "-q", "-b", "release/2026", src.to_str().unwrap()],
+    );
+    env.commit(&src, "a.txt", "init");
+    let origin = env.root.join("origin.git");
+    env.git(
+        &env.root,
+        &[
+            "clone",
+            "-q",
+            "--bare",
+            src.to_str().unwrap(),
+            origin.to_str().unwrap(),
+        ],
+    );
+    let (code, out, _) = env.wt(&env.root, &["init", origin.to_str().unwrap(), "rel"]);
+    assert_eq!(code, 0, "{out}");
+    assert!(out.contains("Default branch: release/2026"), "{out}");
+    let wt = env.root.join("rel/release-2026");
+    assert!(wt.is_dir(), "{out}");
+    let up = env.git(&wt, &["rev-parse", "--abbrev-ref", "@{u}"]);
+    assert_eq!(up.trim(), "origin/release/2026");
+}

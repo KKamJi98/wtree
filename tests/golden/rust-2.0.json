@@ -9,6 +9,16 @@
       "stderr": "",
       "stdout": "{\n  \"worktrees\": [\n    {\n      \"branch\": \"feat/login\",\n      \"path\": \"<ROOT>/proj/feat-login\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"feat/x\",\n      \"path\": \"<ROOT>/proj/feat-x\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"hotfix\",\n      \"path\": \"<ROOT>/proj/hotfix\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"main\",\n      \"path\": \"<ROOT>/proj/main\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"staging\",\n      \"path\": \"<ROOT>/proj/staging\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    }\n  ],\n  \"summary\": {\n    \"total\": 5,\n    \"clean\": 5,\n    \"dirty\": 0\n  }\n}\n"
     },
+    "init-release-default": {
+      "argv": [
+        "init",
+        "<ROOT>/origin.git",
+        "rel"
+      ],
+      "code": 0,
+      "stderr": "",
+      "stdout": "Initializing worktree repository\n  URL:    <ROOT>/origin.git\n  Path:   <ROOT>/rel\n\nStep 1: Clone bare repository\n  OK cloned to <ROOT>/rel/.bare\n\nStep 2: Configure fetch refspec\n  OK configured fetch refspec\n  OK fetched all branches\n\nStep 3: Create worktrees\n  Default branch: release/2026\n  OK created worktree: release-2026/\n  OK set upstream to origin/release/2026\n\nStep 4: Create common branch worktrees\n  OK created worktree: main/\n  OK set core.bare=false\n\n✓ Initialization complete!\n\nNext steps:\n  cd <ROOT>/rel/release-2026\n  wt status\n\nTo add more worktrees:\n  cd <ROOT>/rel/.bare\n  git worktree add ../<branch-name> <branch-name>\n"
+    },
     "list-json-empty": {
       "argv": [
         "list",
@@ -67,6 +77,7 @@
   },
   "reasons": {
     "abbrev-long-json": "fix 1: --json prints only JSON (no Bare repo header)",
+    "init-release-default": "fix 3: a default branch with a slash (release/2026) is kept whole; its worktree dir is release-2026",
     "list-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-korean": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)",

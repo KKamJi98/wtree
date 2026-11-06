@@ -56,6 +56,7 @@ CHANGED: dict[str, str] = {
     "list-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-korean": "fix 1: --json prints only JSON (no Bare repo header)",
     "rm-suffix-in": "fix 2: identifiers match whole trailing path components, so in no longer matches main and feat-login",
+    "init-release-default": "fix 3: a default branch with a slash (release/2026) is kept whole; its worktree dir is release-2026",
 }
 
 ENV_BASE = {

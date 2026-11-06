@@ -266,13 +266,12 @@ pub fn get_default_branch(bare_repo: &Path) -> String {
         Some(bare_repo),
     );
     if result.ok() {
-        // refs/remotes/origin/main -> main
-        return result
-            .stdout
-            .trim()
-            .rsplit('/')
-            .next()
-            .unwrap_or("")
+        // refs/remotes/origin/release/2026 -> release/2026 (1.x kept only the
+        // last component and turned it into "2026").
+        let full = result.stdout.trim();
+        return full
+            .strip_prefix("refs/remotes/origin/")
+            .unwrap_or(full)
             .to_string();
     }
     for branch in ["main", "master"] {
