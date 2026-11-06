@@ -1,6 +1,6 @@
 [package]
 name = "kkamji-wtree"
-version = "2.0.1"
+version = "2.0.2"
 edition = "2021"
 rust-version = "1.85"
 description = "See every worktree's status, sync clean branches, and create or remove worktrees from one bare clone."
