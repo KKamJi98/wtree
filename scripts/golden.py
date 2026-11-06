@@ -426,8 +426,9 @@ ALIASES = {"a", "rm", "st", "f", "p", "ls", "up", "help"}
 def normalise(text: str, root: Path) -> str:
     for variant in {str(root), str(root.resolve()), "/private" + str(root)}:
         text = text.replace(variant, "<ROOT>")
-    # curl reports how long a refused connection took.
-    return re.sub(r"after \d+ ms", "after N ms", text)
+    # The transport error after "unable to access" comes from curl and its
+    # wording differs between platforms and curl versions.
+    return re.sub(r"(fatal: unable to access '[^']*'): .*", r"\1: <transport error>", text)
 
 
 def build(scene: str, base: Path) -> tuple[Scene, Path]:

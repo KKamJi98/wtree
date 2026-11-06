@@ -145,7 +145,7 @@
       ],
       "code": 1,
       "stderr": "",
-      "stdout": "Initializing worktree repository\n  URL:    https://user:SECRET-TOKEN@127.0.0.1:9/x.git\n  Path:   <ROOT>/cred\n\nStep 1: Clone bare repository\n  FAIL git clone --bare failed\n  Cloning into bare repository '<ROOT>/cred/.bare'...\nfatal: unable to access 'https://127.0.0.1:9/x.git/': Failed to connect to 127.0.0.1:9 after N ms: Could not connect to server\n"
+      "stdout": "Initializing worktree repository\n  URL:    https://user:SECRET-TOKEN@127.0.0.1:9/x.git\n  Path:   <ROOT>/cred\n\nStep 1: Clone bare repository\n  FAIL git clone --bare failed\n  Cloning into bare repository '<ROOT>/cred/.bare'...\nfatal: unable to access 'https://127.0.0.1:9/x.git/': <transport error>\n"
     },
     "init-default-name": {
       "argv": [
