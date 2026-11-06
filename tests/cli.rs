@@ -595,3 +595,21 @@ fn init_does_not_print_url_credentials() {
         "{out}"
     );
 }
+
+#[test]
+fn remove_failure_messages_are_english() {
+    let env = Env::new();
+    let proj = env.layout(&["main", "x"], &["main", "x"]);
+    env.git(
+        &proj.join(".bare"),
+        &["worktree", "lock", proj.join("x").to_str().unwrap()],
+    );
+    let (code, out, _) = env.wt(&proj.join("main"), &["rm", "-y", "-b", "x"]);
+    assert_eq!(code, 2, "{out}");
+    assert!(out.contains("FAIL worktree remove failed: "), "{out}");
+    assert!(
+        out.contains("SKIP branch delete skipped because worktree removal failed (x)"),
+        "{out}"
+    );
+    assert!(out.is_ascii(), "{out}");
+}

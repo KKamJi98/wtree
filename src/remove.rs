@@ -553,14 +553,14 @@ pub fn cmd_remove(bare_repo: &Path, opts: &RemoveOptions) -> i32 {
         let branch_deletable = !wt.branch.is_empty() && !wt.branch.starts_with("(detached");
         if !result.ok() {
             say!(
-                "  {}FAIL{} worktree 제거 실패: {}",
+                "  {}FAIL{} worktree remove failed: {}",
                 red(),
                 reset(),
                 result.stderr.trim()
             );
             if opts.delete_branch && branch_deletable {
                 say!(
-                    "  {}SKIP{} worktree 제거 실패로 branch 삭제를 건너뜁니다 ({})",
+                    "  {}SKIP{} branch delete skipped because worktree removal failed ({})",
                     yellow(),
                     reset(),
                     wt.branch

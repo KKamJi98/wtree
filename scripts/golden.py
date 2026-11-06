@@ -61,6 +61,7 @@ CHANGED: dict[str, str] = {
     "init-into-file": "fix 5: a file at the target path is a clear error instead of a NotADirectoryError traceback",
     "add-normal-clone": "fix 6: in a regular clone wt add needs an explicit path instead of nesting the worktree inside the checkout",
     "add-glob-branch": "fix 7: branch existence is an exact ref lookup, so ma* no longer matches main",
+    "rm-locked-fails": "fix 10: the worktree-removal failure lines are in English like the rest of the output",
 }
 
 ENV_BASE = {
