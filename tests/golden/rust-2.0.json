@@ -45,7 +45,7 @@
       ],
       "code": 1,
       "stderr": "",
-      "stdout": "Initializing worktree repository\n  URL:    https://user:SECRET-TOKEN@127.0.0.1:9/x.git\n  Path:   <ROOT>/cred\n\nStep 1: Clone bare repository\n  FAIL git clone --bare failed\n  Cloning into bare repository '<ROOT>/cred/.bare'...\nfatal: unable to access 'https://127.0.0.1:9/x.git/': Failed to connect to 127.0.0.1:9 after N ms: Could not connect to server\n  INFO removed the partial setup in <ROOT>/cred\n"
+      "stdout": "Initializing worktree repository\n  URL:    https://***@127.0.0.1:9/x.git\n  Path:   <ROOT>/cred\n\nStep 1: Clone bare repository\n  FAIL git clone --bare failed\n  Cloning into bare repository '<ROOT>/cred/.bare'...\nfatal: unable to access 'https://127.0.0.1:9/x.git/': Failed to connect to 127.0.0.1:9 after N ms: Could not connect to server\n  INFO removed the partial setup in <ROOT>/cred\n"
     },
     "init-into-file": {
       "argv": [
@@ -128,7 +128,7 @@
     "add-glob-branch": "fix 7: branch existence is an exact ref lookup, so ma* no longer matches main",
     "add-normal-clone": "fix 6: in a regular clone wt add needs an explicit path instead of nesting the worktree inside the checkout",
     "init-clone-fails": "fix 4: a failed init removes the directory it created",
-    "init-credential-url": "fix 4: a failed init removes the directory it created",
+    "init-credential-url": "fix 4 and 9: partial setup removed; URL credentials shown as ***",
     "init-into-file": "fix 5: a file at the target path is a clear error instead of a NotADirectoryError traceback",
     "init-release-default": "fix 3: a default branch with a slash (release/2026) is kept whole; its worktree dir is release-2026",
     "list-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",

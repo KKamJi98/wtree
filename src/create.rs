@@ -8,6 +8,20 @@ use crate::paths;
 use crate::repo;
 use crate::say;
 
+/// `url` with any `user:password@` part replaced by `***@`, for display only.
+/// git still receives the original URL.
+pub fn redact_url(url: &str) -> String {
+    let Some(scheme_end) = url.find("://") else {
+        return url.to_string();
+    };
+    let rest = &url[scheme_end + 3..];
+    let authority_end = rest.find(['/', '?', '#']).unwrap_or(rest.len());
+    match rest[..authority_end].rfind('@') {
+        Some(at) => format!("{}***{}", &url[..scheme_end + 3], &rest[at..]),
+        None => url.to_string(),
+    }
+}
+
 /// Directory name `wt init` derives from a clone URL.
 pub fn repo_dir_name(url: &str) -> String {
     // Split on ':' too, for scp-like URLs without a slash (git@host:repo.git).
@@ -99,7 +113,7 @@ pub fn cmd_init(repo_url: &str, path: Option<&str>, worktrees: Option<&[String]>
     }
 
     say!("{}Initializing worktree repository{}", bold(), reset());
-    say!("  URL:    {repo_url}");
+    say!("  URL:    {}", redact_url(repo_url));
     say!("  Path:   {}", target.display());
     say!();
 
@@ -457,6 +471,21 @@ pub fn cmd_add(
 #[cfg(test)]
 mod tests {
     use super::repo_dir_name;
+
+    #[test]
+    fn redacts_userinfo_only() {
+        use super::redact_url;
+        assert_eq!(
+            redact_url("https://user:tok@host/o/r.git"),
+            "https://***@host/o/r.git"
+        );
+        assert_eq!(redact_url("https://host/o/r.git"), "https://host/o/r.git");
+        assert_eq!(
+            redact_url("git@github.com:o/r.git"),
+            "git@github.com:o/r.git"
+        );
+        assert_eq!(redact_url("https://host/a@b"), "https://host/a@b");
+    }
 
     #[test]
     fn dir_name_from_url() {

@@ -57,7 +57,7 @@ CHANGED: dict[str, str] = {
     "rm-suffix-in": "fix 2: identifiers match whole trailing path components, so in no longer matches main and feat-login",
     "init-release-default": "fix 3: a default branch with a slash (release/2026) is kept whole; its worktree dir is release-2026",
     "init-clone-fails": "fix 4: a failed init removes the directory it created",
-    "init-credential-url": "fix 4: a failed init removes the directory it created",
+    "init-credential-url": "fix 4 and 9: partial setup removed; URL credentials shown as ***",
     "init-into-file": "fix 5: a file at the target path is a clear error instead of a NotADirectoryError traceback",
     "add-normal-clone": "fix 6: in a regular clone wt add needs an explicit path instead of nesting the worktree inside the checkout",
     "add-glob-branch": "fix 7: branch existence is an exact ref lookup, so ma* no longer matches main",

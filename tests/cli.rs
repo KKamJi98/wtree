@@ -578,3 +578,20 @@ fn branch_lookups_are_not_globs() {
     assert!(out.contains("Branch 'ma*' does not exist"), "{out}");
     assert!(!out.contains("invalid reference: ma*"), "{out}");
 }
+
+#[test]
+fn init_does_not_print_url_credentials() {
+    let env = Env::new();
+    // Port 9 on localhost refuses immediately; nothing leaves the machine.
+    let url = "https://user:SECRET-TOKEN@127.0.0.1:9/x.git";
+    let (code, out, err) = env.wt(&env.root, &["init", url, "cred"]);
+    assert_eq!(code, 1);
+    assert!(
+        !out.contains("SECRET-TOKEN") && !err.contains("SECRET-TOKEN"),
+        "{out}{err}"
+    );
+    assert!(
+        out.contains("URL:    https://***@127.0.0.1:9/x.git"),
+        "{out}"
+    );
+}
