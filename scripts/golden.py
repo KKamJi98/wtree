@@ -44,7 +44,6 @@ EXCEPTIONS: dict[str, tuple[str, str]] = {
     "usage-subcommand-prefix": ("code-only", "usage error wording differs; exit 2 kept"),
     "usage-interleaved": ("code-only", "usage error wording differs; exit 2 kept"),
     "usage-add-missing": ("code-only", "usage error wording differs; exit 2 kept"),
-    "init-into-file": ("code-only", "1.x crashed with a NotADirectoryError traceback"),
 }
 
 # Filled in as Phase 3/4 changes land: case id -> reason.
@@ -59,6 +58,7 @@ CHANGED: dict[str, str] = {
     "init-release-default": "fix 3: a default branch with a slash (release/2026) is kept whole; its worktree dir is release-2026",
     "init-clone-fails": "fix 4: a failed init removes the directory it created",
     "init-credential-url": "fix 4: a failed init removes the directory it created",
+    "init-into-file": "fix 5: a file at the target path is a clear error instead of a NotADirectoryError traceback",
 }
 
 ENV_BASE = {

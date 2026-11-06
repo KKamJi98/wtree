@@ -29,6 +29,16 @@
       "stderr": "",
       "stdout": "Initializing worktree repository\n  URL:    https://user:SECRET-TOKEN@127.0.0.1:9/x.git\n  Path:   <ROOT>/cred\n\nStep 1: Clone bare repository\n  FAIL git clone --bare failed\n  Cloning into bare repository '<ROOT>/cred/.bare'...\nfatal: unable to access 'https://127.0.0.1:9/x.git/': Failed to connect to 127.0.0.1:9 after N ms: Could not connect to server\n  INFO removed the partial setup in <ROOT>/cred\n"
     },
+    "init-into-file": {
+      "argv": [
+        "init",
+        "<ROOT>/origin.git",
+        "src/a.txt"
+      ],
+      "code": 1,
+      "stderr": "",
+      "stdout": "Error: '<ROOT>/src/a.txt' exists and is not a directory.\n"
+    },
     "init-release-default": {
       "argv": [
         "init",
@@ -99,6 +109,7 @@
     "abbrev-long-json": "fix 1: --json prints only JSON (no Bare repo header)",
     "init-clone-fails": "fix 4: a failed init removes the directory it created",
     "init-credential-url": "fix 4: a failed init removes the directory it created",
+    "init-into-file": "fix 5: a file at the target path is a clear error instead of a NotADirectoryError traceback",
     "init-release-default": "fix 3: a default branch with a slash (release/2026) is kept whole; its worktree dir is release-2026",
     "list-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-korean": "fix 1: --json prints only JSON (no Bare repo header)",

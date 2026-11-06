@@ -74,6 +74,15 @@ pub fn cmd_init(repo_url: &str, path: Option<&str>, worktrees: Option<&[String]>
     let bare = target.join(".bare");
     let bare_str = bare.to_string_lossy().into_owned();
 
+    if target.exists() && !target.is_dir() {
+        say!(
+            "{}Error:{} '{}' exists and is not a directory.",
+            red(),
+            reset(),
+            target.display()
+        );
+        return 1;
+    }
     if target.exists() && dir_is_nonempty(&target) {
         say!(
             "{}Error:{} Directory '{}' already exists and is not empty.",

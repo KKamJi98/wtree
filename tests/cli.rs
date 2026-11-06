@@ -529,3 +529,13 @@ fn failed_init_removes_only_what_it_created() {
     assert_eq!(code, 1);
     assert!(!out.contains("already exists"), "{out}");
 }
+
+#[test]
+fn init_onto_a_file_is_a_clear_error() {
+    let env = Env::new();
+    fs::write(env.root.join("afile"), "x").unwrap();
+    let (code, out, err) = env.wt(&env.root, &["init", "unused-url", "afile"]);
+    assert_eq!(code, 1);
+    assert!(out.contains("exists and is not a directory."), "{out}{err}");
+    assert!(err.is_empty(), "{err}");
+}
