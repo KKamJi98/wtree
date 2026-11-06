@@ -117,9 +117,17 @@ fn run(cli: Cli) -> i32 {
 
 fn main() {
     // Shell completion requests (COMPLETE=<shell>) are answered and exit here.
+    use clap_complete::env::{Bash, Elvish, Fish, Powershell, Shells};
     clap_complete::CompleteEnv::with_factory(cli::command)
         .bin("wt")
         .completer("wt")
+        .shells(Shells(&[
+            &Bash,
+            &Elvish,
+            &Fish,
+            &Powershell,
+            &complete::ZshAutoload,
+        ]))
         .complete();
 
     out::init_colors();

@@ -278,8 +278,30 @@ returning non-zero) still clean up.
   the second Tab on, worktree directory names and options are offered
   (checked on macOS with `~/.zfunc/_wt` and on WSL with the Homebrew
   site-functions file). The 1.x argcomplete script called its completer on
-  the autoload pass. A wrapper that does the same would need a custom zsh
-  completer in `wt` and a new release; it was not done in 2.0.0.
+  the autoload pass. Fixed in 2.0.1 (below).
+
+## 2.0.1: zsh completion on the first Tab
+
+The plan's goal includes `wt rm <Tab>` listing worktree directories, and 1.x
+did that on the first Tab. 2.0.1 therefore registers its own zsh completer
+(`complete::ZshAutoload`): the clap_complete 4.6.11 script with its last line
+replaced by
+
+```zsh
+if [[ ${zsh_eval_context[-1]} == loadautofunc ]]; then
+    _clap_dynamic_completer_wt "$@"
+else
+    compdef _clap_dynamic_completer_wt wt
+fi
+```
+
+so an autoload from `fpath` also completes, while `source <(COMPLETE=zsh wt)`
+still only registers. Candidates (`write_complete`) and the bash, fish,
+elvish and PowerShell scripts are unchanged. `tests/cli.rs`
+`zsh_completes_on_the_first_tab_after_autoload` drives an interactive zsh
+through `zpty` and failed (bell only) before the change. 2.0.1 is also the
+first release published by the workflow's Trusted Publishing and the first
+tap push with the `release` environment key.
 
 ### After the release: tap key in the `release` environment (2026-11-07)
 
