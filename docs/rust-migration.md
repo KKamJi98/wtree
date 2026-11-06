@@ -249,8 +249,11 @@ with tests in `tests/cli.rs` before the merge:
 Known limitation, not fixed: if git itself fails unexpectedly (non-UTF-8
 output, the working directory disappears) during `wt init` after the clone,
 `wt` ends with `Error:` and exit 1 without the cleanup of fix 4, and the new
-`.bare` stays behind. Normal git failures (`clone`, `fetch`, `worktree add`
-returning non-zero) still clean up.
+`.bare` stays behind. Non-zero clone/default-worktree creation failures
+trigger cleanup. Correction from the README showcase review: fetch failure can
+be ignored, and additional-worktree creation failures only warn and retain the
+setup; init can still return 0. The previous broad claim that every normal
+fetch/worktree failure cleans up was inaccurate; no behavior changed here.
 
 ## Release (2026-11-07)
 
