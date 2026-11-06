@@ -16,7 +16,7 @@ mod repo;
 use clap::Parser;
 
 use cli::{Cli, Command};
-use out::{bold, red, reset};
+use out::{bold, reset};
 
 fn run(cli: Cli) -> i32 {
     let Some(command) = cli.command else {
@@ -40,16 +40,12 @@ fn run(cli: Cli) -> i32 {
     }
 
     let Some(bare_repo) = repo::find_bare_repo(None) else {
-        say!(
-            "{}Error:{} Not inside a git worktree repository.",
-            red(),
-            reset()
-        );
-        say!();
-        say!("To initialize a new repository:");
-        say!("  wt init <repo-url> [path]");
-        say!();
-        say!("Or run this command from within an existing worktree directory.");
+        say_err!("Error: Not inside a git worktree repository.");
+        say_err!();
+        say_err!("To initialize a new repository:");
+        say_err!("  wt init <repo-url> [path]");
+        say_err!();
+        say_err!("Or run this command from within an existing worktree directory.");
         return 1;
     };
 
@@ -97,11 +93,7 @@ fn run(cli: Cli) -> i32 {
             yes,
         } => {
             if remote && !branch {
-                say!(
-                    "{}Error:{} --remote requires -b/--branch flag",
-                    red(),
-                    reset()
-                );
+                say_err!("Error: --remote requires -b/--branch flag");
                 return 1;
             }
             remove::cmd_remove(

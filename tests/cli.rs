@@ -291,9 +291,9 @@ fn add_tracks_remote_branch_and_auto_creates_new_one() {
     );
     assert!(proj.join("brand-new").is_dir());
 
-    let (code, out, _) = env.wt(&main, &["add", "other", "../main"]);
+    let (code, _, err) = env.wt(&main, &["add", "other", "../main"]);
     assert_eq!(code, 1);
-    assert!(out.contains("already exists"), "{out}");
+    assert!(err.contains("already exists"), "{err}");
 }
 
 #[test]
@@ -359,11 +359,11 @@ fn init_builds_layout_and_sets_core_bare_false() {
 #[test]
 fn outside_a_repository_is_an_error() {
     let env = Env::new();
-    let (code, out, _) = env.wt(&env.root, &["status"]);
+    let (code, _, err) = env.wt(&env.root, &["status"]);
     assert_eq!(code, 1);
     assert!(
-        out.contains("Not inside a git worktree repository."),
-        "{out}"
+        err.contains("Not inside a git worktree repository."),
+        "{err}"
     );
 }
 
@@ -464,9 +464,9 @@ fn identifier_suffix_matches_whole_path_components_only() {
     let proj = env.layout(&["main", "feat/login"], &["main", "feat/login"]);
     let main = proj.join("main");
     // "in" is a character suffix of both "main" and "feat-login".
-    let (code, out, _) = env.wt(&main, &["rm", "--dry-run", "in"]);
-    assert_eq!(code, 1, "{out}");
-    assert!(out.contains("No matching worktrees found."), "{out}");
+    let (code, _, err) = env.wt(&main, &["rm", "--dry-run", "in"]);
+    assert_eq!(code, 1, "{err}");
+    assert!(err.contains("No matching worktrees found."), "{err}");
     // A trailing run of whole components still matches.
     let (code, out, _) = env.wt(&main, &["rm", "--dry-run", "proj/main"]);
     assert_eq!(code, 0, "{out}");
@@ -536,8 +536,8 @@ fn init_onto_a_file_is_a_clear_error() {
     fs::write(env.root.join("afile"), "x").unwrap();
     let (code, out, err) = env.wt(&env.root, &["init", "unused-url", "afile"]);
     assert_eq!(code, 1);
-    assert!(out.contains("exists and is not a directory."), "{out}{err}");
-    assert!(err.is_empty(), "{err}");
+    assert!(err.contains("exists and is not a directory."), "{out}{err}");
+    assert!(!err.contains("cannot read"), "{err}");
 }
 
 #[test]
@@ -555,9 +555,9 @@ fn add_in_a_regular_clone_needs_an_explicit_path() {
             clone.to_str().unwrap(),
         ],
     );
-    let (code, out, _) = env.wt(&clone, &["add", "feat/x"]);
-    assert_eq!(code, 1, "{out}");
-    assert!(out.contains("wt add feat/x <path>"), "{out}");
+    let (code, _, err) = env.wt(&clone, &["add", "feat/x"]);
+    assert_eq!(code, 1, "{err}");
+    assert!(err.contains("wt add feat/x <path>"), "{err}");
     assert!(
         !clone.join("feat-x").exists(),
         "nothing created inside the clone"
@@ -625,4 +625,33 @@ fn version_flag_prints_the_crate_version() {
     // Wrong input: the subcommands do not take it.
     let (code, _, _) = env.wt(&env.root, &["status", "--version"]);
     assert_eq!(code, 2);
+}
+
+#[test]
+fn errors_go_to_stderr() {
+    let env = Env::new();
+    let (code, out, err) = env.wt(&env.root, &["status"]);
+    assert_eq!(code, 1);
+    assert!(out.is_empty(), "{out}");
+    assert!(
+        err.starts_with("Error: Not inside a git worktree repository."),
+        "{err}"
+    );
+
+    let proj = env.layout(&["main"], &["main"]);
+    let main = proj.join("main");
+    let (code, out, err) = env.wt(&main, &["rm", "ghost"]);
+    assert_eq!(code, 1);
+    assert!(err.contains("Error: No matching worktrees found."), "{err}");
+    assert!(err.contains("Available worktrees:"), "{err}");
+    assert!(!out.contains("Error:"), "{out}");
+
+    let (code, _, err) = env.wt(&main, &["add", "x", "../main"]);
+    assert_eq!(code, 1);
+    assert!(err.contains("Error: Path '"), "{err}");
+
+    // Progress and results stay on stdout.
+    let (code, out, err) = env.wt(&main, &["list"]);
+    assert_eq!(code, 0);
+    assert!(out.contains("main") && err.is_empty(), "{out}{err}");
 }

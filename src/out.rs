@@ -80,6 +80,18 @@ pub fn fatal(msg: &str) -> ! {
     std::process::exit(1);
 }
 
+/// `eprintln!`-style shorthand for [`emit_err`]. Errors carry no colors:
+/// whether stdout is a terminal says nothing about stderr.
+#[macro_export]
+macro_rules! say_err {
+    () => {
+        $crate::out::emit_err("")
+    };
+    ($($arg:tt)*) => {
+        $crate::out::emit_err(&format!($($arg)*))
+    };
+}
+
 /// `println!`-style shorthand for [`emit`].
 #[macro_export]
 macro_rules! say {

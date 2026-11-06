@@ -24,8 +24,18 @@
         "feat/x"
       ],
       "code": 1,
-      "stderr": "",
-      "stdout": "Bare repo: <ROOT>/normal/.git\n\nError: '<ROOT>/normal' is a regular clone, not a .bare layout; the default path would be inside its working tree.\n  give the worktree path explicitly: wt add feat/x <path>\n"
+      "stderr": "Error: '<ROOT>/normal' is a regular clone, not a .bare layout; the default path would be inside its working tree.\n  give the worktree path explicitly: wt add feat/x <path>\n",
+      "stdout": "Bare repo: <ROOT>/normal/.git\n\n"
+    },
+    "add-path-exists": {
+      "argv": [
+        "add",
+        "hotfix",
+        "../main"
+      ],
+      "code": 1,
+      "stderr": "Error: Path '<ROOT>/proj/main' already exists.\n",
+      "stdout": "Bare repo: <ROOT>/proj/.bare\n\n"
     },
     "init-clone-fails": {
       "argv": [
@@ -54,8 +64,18 @@
         "src/a.txt"
       ],
       "code": 1,
-      "stderr": "",
-      "stdout": "Error: '<ROOT>/src/a.txt' exists and is not a directory.\n"
+      "stderr": "Error: '<ROOT>/src/a.txt' exists and is not a directory.\n",
+      "stdout": ""
+    },
+    "init-nonempty-dir": {
+      "argv": [
+        "init",
+        "<ROOT>/origin.git",
+        "src"
+      ],
+      "code": 1,
+      "stderr": "Error: Directory '<ROOT>/src' already exists and is not empty.\n",
+      "stdout": ""
     },
     "init-release-default": {
       "argv": [
@@ -94,6 +114,14 @@
       "stderr": "",
       "stdout": "[\n  {\n    \"branch\": \"(detached 20ed2fdc)\",\n    \"path\": \"<ROOT>/proj/det\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": true\n  },\n  {\n    \"branch\": \"feat/login\",\n    \"path\": \"<ROOT>/proj/feat-login\",\n    \"commit\": \"29f93996\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"feat/x\",\n    \"path\": \"<ROOT>/proj/feat-x\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"hotfix\",\n    \"path\": \"<ROOT>/proj/hotfix\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"local-only\",\n    \"path\": \"<ROOT>/proj/local-only\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"main\",\n    \"path\": \"<ROOT>/proj/main\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"staging\",\n    \"path\": \"<ROOT>/proj/staging\",\n    \"commit\": \"b5cf1aa7\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"upstream-me\",\n    \"path\": \"<ROOT>/proj/upstream-me\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  }\n]\n"
     },
+    "not-a-repo": {
+      "argv": [
+        "status"
+      ],
+      "code": 1,
+      "stderr": "Error: Not inside a git worktree repository.\n\nTo initialize a new repository:\n  wt init <repo-url> [path]\n\nOr run this command from within an existing worktree directory.\n",
+      "stdout": ""
+    },
     "rm-locked-fails": {
       "argv": [
         "rm",
@@ -105,6 +133,33 @@
       "stderr": "",
       "stdout": "Bare repo: <ROOT>/proj/.bare\n\nMatched worktrees: 1\n  hotfix                          <ROOT>/proj/hotfix\n\nRemoving worktree: hotfix\n  Path: <ROOT>/proj/hotfix\n  FAIL worktree remove failed: fatal: cannot remove a locked working tree;\nuse 'remove -f -f' to override or unlock first\n  SKIP branch delete skipped because worktree removal failed (hotfix)\n\nSummary: ok=0 skip=0 kept=0 fail=1\n"
     },
+    "rm-no-args": {
+      "argv": [
+        "rm"
+      ],
+      "code": 1,
+      "stderr": "Error: Please provide identifier(s) or --match pattern(s).\n",
+      "stdout": "Bare repo: <ROOT>/proj/.bare\n\n"
+    },
+    "rm-no-match": {
+      "argv": [
+        "rm",
+        "nothing-here"
+      ],
+      "code": 1,
+      "stderr": "Error: No matching worktrees found.\n  identifiers: nothing-here\n\nAvailable worktrees:\n  feat/login                      <ROOT>/proj/feat-login\n  feat/x                          <ROOT>/proj/feat-x\n  hotfix                          <ROOT>/proj/hotfix\n  main                            <ROOT>/proj/main\n  staging                         <ROOT>/proj/staging\n",
+      "stdout": "Bare repo: <ROOT>/proj/.bare\n\n"
+    },
+    "rm-remote-without-b": {
+      "argv": [
+        "rm",
+        "--remote",
+        "hotfix"
+      ],
+      "code": 1,
+      "stderr": "Error: --remote requires -b/--branch flag\n",
+      "stdout": "Bare repo: <ROOT>/proj/.bare\n\n"
+    },
     "rm-suffix-in": {
       "argv": [
         "rm",
@@ -112,8 +167,8 @@
         "in"
       ],
       "code": 1,
-      "stderr": "",
-      "stdout": "Bare repo: <ROOT>/proj/.bare\n\nError: No matching worktrees found.\n  identifiers: in\n\nAvailable worktrees:\n  feat/login                      <ROOT>/proj/feat-login\n  feat/x                          <ROOT>/proj/feat-x\n  hotfix                          <ROOT>/proj/hotfix\n  main                            <ROOT>/proj/main\n  staging                         <ROOT>/proj/staging\n"
+      "stderr": "Error: No matching worktrees found.\n  identifiers: in\n\nAvailable worktrees:\n  feat/login                      <ROOT>/proj/feat-login\n  feat/x                          <ROOT>/proj/feat-x\n  hotfix                          <ROOT>/proj/hotfix\n  main                            <ROOT>/proj/main\n  staging                         <ROOT>/proj/staging\n",
+      "stdout": "Bare repo: <ROOT>/proj/.bare\n\n"
     },
     "status-json-empty": {
       "argv": [
@@ -145,16 +200,22 @@
   "reasons": {
     "abbrev-long-json": "fix 1: --json prints only JSON (no Bare repo header)",
     "add-glob-branch": "fix 7: branch existence is an exact ref lookup, so ma* no longer matches main",
-    "add-normal-clone": "fix 6: in a regular clone wt add needs an explicit path instead of nesting the worktree inside the checkout",
+    "add-normal-clone": "fix 6 (+ P1 stderr): in a regular clone wt add needs an explicit path instead of nesting the worktree inside the checkout",
+    "add-path-exists": "P1: Error messages go to stderr; stdout keeps progress and results",
     "init-clone-fails": "fix 4: a failed init removes the directory it created",
     "init-credential-url": "fix 4 and 9: partial setup removed; URL credentials shown as ***",
-    "init-into-file": "fix 5: a file at the target path is a clear error instead of a NotADirectoryError traceback",
+    "init-into-file": "fix 5 (+ P1 stderr): a file at the target path is a clear error instead of a NotADirectoryError traceback",
+    "init-nonempty-dir": "P1: Error messages go to stderr; stdout keeps progress and results",
     "init-release-default": "fix 3: a default branch with a slash (release/2026) is kept whole; its worktree dir is release-2026",
     "list-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-korean": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)",
+    "not-a-repo": "P1: Error messages go to stderr; stdout keeps progress and results",
     "rm-locked-fails": "fix 10: the worktree-removal failure lines are in English like the rest of the output",
-    "rm-suffix-in": "fix 2: identifiers match whole trailing path components, so in no longer matches main and feat-login",
+    "rm-no-args": "P1: Error messages go to stderr; stdout keeps progress and results",
+    "rm-no-match": "P1: Error messages go to stderr; stdout keeps progress and results",
+    "rm-remote-without-b": "P1: Error messages go to stderr; stdout keeps progress and results",
+    "rm-suffix-in": "fix 2 (+ P1 stderr): identifiers match whole trailing path components, so in no longer matches main and feat-login",
     "status-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
     "status-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)",
     "usage-version": "P1: wt --version prints wt <version> (1.x had no such option)"

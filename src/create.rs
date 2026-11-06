@@ -7,6 +7,7 @@ use crate::out::{blue, bold, fatal, green, red, reset, yellow};
 use crate::paths;
 use crate::repo;
 use crate::say;
+use crate::say_err;
 
 /// `url` with any `user:password@` part replaced by `***@`, for display only.
 /// git still receives the original URL.
@@ -94,19 +95,15 @@ pub fn cmd_init(repo_url: &str, path: Option<&str>, worktrees: Option<&[String]>
     let bare_str = bare.to_string_lossy().into_owned();
 
     if target.exists() && !target.is_dir() {
-        say!(
-            "{}Error:{} '{}' exists and is not a directory.",
-            red(),
-            reset(),
+        say_err!(
+            "Error: '{}' exists and is not a directory.",
             target.display()
         );
         return 1;
     }
     if target.exists() && dir_is_nonempty(&target) {
-        say!(
-            "{}Error:{} Directory '{}' already exists and is not empty.",
-            red(),
-            reset(),
+        say_err!(
+            "Error: Directory '{}' already exists and is not empty.",
             target.display()
         );
         return 1;
@@ -327,13 +324,11 @@ pub fn cmd_add(
     // main working tree: the default location would nest the new worktree
     // inside the checkout. Only the .bare layout has a container parent.
     if path.is_none() && bare_repo.file_name().is_some_and(|n| n == ".git") {
-        say!(
-            "{}Error:{} '{}' is a regular clone, not a .bare layout; the default path would be inside its working tree.",
-            red(),
-            reset(),
+        say_err!(
+            "Error: '{}' is a regular clone, not a .bare layout; the default path would be inside its working tree.",
             bare_repo.parent().unwrap_or(bare_repo).display()
         );
-        say!("  give the worktree path explicitly: wt add {branch} <path>");
+        say_err!("  give the worktree path explicitly: wt add {branch} <path>");
         return 1;
     }
 
@@ -347,12 +342,7 @@ pub fn cmd_add(
     let wt_str = wt_path.to_string_lossy().into_owned();
 
     if wt_path.exists() {
-        say!(
-            "{}Error:{} Path '{}' already exists.",
-            red(),
-            reset(),
-            wt_path.display()
-        );
+        say_err!("Error: Path '{}' already exists.", wt_path.display());
         return 1;
     }
 

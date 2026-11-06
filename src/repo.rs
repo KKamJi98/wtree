@@ -3,9 +3,8 @@
 use std::path::{Path, PathBuf};
 
 use crate::git;
-use crate::out::{red, reset};
 use crate::paths;
-use crate::say;
+use crate::say_err;
 
 #[derive(Debug, Clone)]
 pub struct Worktree {
@@ -136,12 +135,7 @@ fn list_worktrees(bare_repo: &Path, quiet: bool) -> Vec<Worktree> {
     let result = git::run(&["worktree", "list", "--porcelain", "-z"], Some(bare_repo));
     if !result.ok() {
         if !quiet && !result.stderr.is_empty() {
-            say!(
-                "{}FAIL{} worktree list failed: {}",
-                red(),
-                reset(),
-                result.stderr.trim()
-            );
+            say_err!("FAIL worktree list failed: {}", result.stderr.trim());
         }
         return Vec::new();
     }

@@ -10,6 +10,7 @@ use crate::out::{emit_flush, green, red, reset, yellow};
 use crate::paths;
 use crate::repo::{self, Worktree};
 use crate::say;
+use crate::say_err;
 
 /// Matching worktrees for an identifier, by priority:
 /// exact branch or exact path, then directory name, then path suffix.
@@ -390,11 +391,7 @@ pub fn cmd_remove(bare_repo: &Path, opts: &RemoveOptions) -> i32 {
         return 1;
     }
     if opts.identifiers.is_empty() && opts.patterns.is_empty() {
-        say!(
-            "{}Error:{} Please provide identifier(s) or --match pattern(s).",
-            red(),
-            reset()
-        );
+        say_err!("Error: Please provide identifier(s) or --match pattern(s).");
         return 1;
     }
 
@@ -424,16 +421,16 @@ pub fn cmd_remove(bare_repo: &Path, opts: &RemoveOptions) -> i32 {
     }
 
     if targets.is_empty() {
-        say!("{}Error:{} No matching worktrees found.", red(), reset());
+        say_err!("Error: No matching worktrees found.");
         if !missing_ids.is_empty() {
-            say!("  identifiers: {}", missing_ids.join(", "));
+            say_err!("  identifiers: {}", missing_ids.join(", "));
         }
         if !missing_patterns.is_empty() {
-            say!("  patterns: {}", missing_patterns.join(", "));
+            say_err!("  patterns: {}", missing_patterns.join(", "));
         }
-        say!("\nAvailable worktrees:");
+        say_err!("\nAvailable worktrees:");
         for wt in &worktrees {
-            say!("  {:<30}  {}", wt.branch, wt.path_str());
+            say_err!("  {:<30}  {}", wt.branch, wt.path_str());
         }
         return 1;
     }
