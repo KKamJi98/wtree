@@ -71,6 +71,10 @@ pub fn cmd_status(bare_repo: &Path, json_output: bool) -> i32 {
                         Value::Str(if st.dirty { "dirty" } else { "clean" }.into()),
                     ),
                     ("sync".into(), Value::Str(sync_value(wt, st))),
+                    (
+                        "upstream".into(),
+                        st.upstream.clone().map_or(Value::Null, Value::Str),
+                    ),
                     ("detached".into(), Value::Bool(wt.is_detached)),
                 ])
             })
@@ -97,21 +101,30 @@ pub fn cmd_status(bare_repo: &Path, json_output: bool) -> i32 {
         .max()
         .unwrap_or(0)
         .max(10);
+    let upstream_of = |st: &repo::Status| st.upstream.clone().unwrap_or_else(|| "-".into());
+    let max_upstream = statuses
+        .iter()
+        .map(|st| char_len(&upstream_of(st)))
+        .max()
+        .unwrap_or(0)
+        .max(8);
 
     say!();
     say!(
-        "{}{} {} {} PATH{}",
+        "{}{} {} {} {} PATH{}",
         bold(),
         ljust("STATUS", 8),
         ljust("BRANCH", max_branch),
         ljust("SYNC", 14),
+        ljust("UPSTREAM", max_upstream),
         reset()
     );
     say!(
-        "{} {} {} {}",
+        "{} {} {} {} {}",
         "-".repeat(8),
         "-".repeat(max_branch),
         "-".repeat(14),
+        "-".repeat(max_upstream),
         "-".repeat(30)
     );
 
@@ -130,10 +143,11 @@ pub fn cmd_status(bare_repo: &Path, json_output: bool) -> i32 {
             ljust(&sync_raw, 14)
         };
         say!(
-            "{} {} {} {}",
+            "{} {} {} {} {}",
             status,
             ljust(&wt.branch, max_branch),
             sync,
+            ljust(&upstream_of(st), max_upstream),
             wt.path_str()
         );
     }

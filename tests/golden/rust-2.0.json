@@ -7,7 +7,7 @@
       ],
       "code": 0,
       "stderr": "",
-      "stdout": "{\n  \"worktrees\": [\n    {\n      \"branch\": \"feat/login\",\n      \"path\": \"<ROOT>/proj/feat-login\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"feat/x\",\n      \"path\": \"<ROOT>/proj/feat-x\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"hotfix\",\n      \"path\": \"<ROOT>/proj/hotfix\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"main\",\n      \"path\": \"<ROOT>/proj/main\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"staging\",\n      \"path\": \"<ROOT>/proj/staging\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    }\n  ],\n  \"summary\": {\n    \"total\": 5,\n    \"clean\": 5,\n    \"dirty\": 0\n  }\n}\n"
+      "stdout": "{\n  \"worktrees\": [\n    {\n      \"branch\": \"feat/login\",\n      \"path\": \"<ROOT>/proj/feat-login\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"upstream\": \"origin/feat/login\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"feat/x\",\n      \"path\": \"<ROOT>/proj/feat-x\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"upstream\": \"origin/feat/x\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"hotfix\",\n      \"path\": \"<ROOT>/proj/hotfix\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"upstream\": \"origin/hotfix\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"main\",\n      \"path\": \"<ROOT>/proj/main\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"upstream\": \"origin/main\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"staging\",\n      \"path\": \"<ROOT>/proj/staging\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"upstream\": \"origin/staging\",\n      \"detached\": false\n    }\n  ],\n  \"summary\": {\n    \"total\": 5,\n    \"clean\": 5,\n    \"dirty\": 0\n  }\n}\n"
     },
     "add-glob-branch": {
       "argv": [
@@ -186,7 +186,39 @@
       ],
       "code": 2,
       "stderr": "",
-      "stdout": "{\n  \"worktrees\": [\n    {\n      \"branch\": \"(detached 20ed2fdc)\",\n      \"path\": \"<ROOT>/proj/det\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"detached\",\n      \"detached\": true\n    },\n    {\n      \"branch\": \"feat/login\",\n      \"path\": \"<ROOT>/proj/feat-login\",\n      \"commit\": \"29f93996\",\n      \"status\": \"clean\",\n      \"sync\": \"\\u21911 \\u21931\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"feat/x\",\n      \"path\": \"<ROOT>/proj/feat-x\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"dirty\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"hotfix\",\n      \"path\": \"<ROOT>/proj/hotfix\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"dirty\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"local-only\",\n      \"path\": \"<ROOT>/proj/local-only\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"no upstream\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"main\",\n      \"path\": \"<ROOT>/proj/main\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"\\u21931\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"staging\",\n      \"path\": \"<ROOT>/proj/staging\",\n      \"commit\": \"b5cf1aa7\",\n      \"status\": \"clean\",\n      \"sync\": \"\\u21911\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"upstream-me\",\n      \"path\": \"<ROOT>/proj/upstream-me\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"no upstream\",\n      \"detached\": false\n    }\n  ],\n  \"summary\": {\n    \"total\": 8,\n    \"clean\": 6,\n    \"dirty\": 2\n  }\n}\n"
+      "stdout": "{\n  \"worktrees\": [\n    {\n      \"branch\": \"(detached 20ed2fdc)\",\n      \"path\": \"<ROOT>/proj/det\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"detached\",\n      \"upstream\": null,\n      \"detached\": true\n    },\n    {\n      \"branch\": \"feat/login\",\n      \"path\": \"<ROOT>/proj/feat-login\",\n      \"commit\": \"29f93996\",\n      \"status\": \"clean\",\n      \"sync\": \"\\u21911 \\u21931\",\n      \"upstream\": \"origin/feat/login\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"feat/x\",\n      \"path\": \"<ROOT>/proj/feat-x\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"dirty\",\n      \"sync\": \"=\",\n      \"upstream\": \"origin/feat/x\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"hotfix\",\n      \"path\": \"<ROOT>/proj/hotfix\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"dirty\",\n      \"sync\": \"=\",\n      \"upstream\": \"origin/hotfix\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"local-only\",\n      \"path\": \"<ROOT>/proj/local-only\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"no upstream\",\n      \"upstream\": null,\n      \"detached\": false\n    },\n    {\n      \"branch\": \"main\",\n      \"path\": \"<ROOT>/proj/main\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"\\u21931\",\n      \"upstream\": \"origin/main\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"staging\",\n      \"path\": \"<ROOT>/proj/staging\",\n      \"commit\": \"b5cf1aa7\",\n      \"status\": \"clean\",\n      \"sync\": \"\\u21911\",\n      \"upstream\": \"origin/staging\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"upstream-me\",\n      \"path\": \"<ROOT>/proj/upstream-me\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"no upstream\",\n      \"upstream\": null,\n      \"detached\": false\n    }\n  ],\n  \"summary\": {\n    \"total\": 8,\n    \"clean\": 6,\n    \"dirty\": 2\n  }\n}\n"
+    },
+    "status-korean": {
+      "argv": [
+        "status"
+      ],
+      "code": 0,
+      "stderr": "",
+      "stdout": "Bare repo: <ROOT>/proj/.bare\n\n\nSTATUS   BRANCH     SYNC           UPSTREAM     PATH\n-------- ---------- -------------- ------------ ------------------------------\nCLEAN    main       =              origin/main  <ROOT>/proj/main\nCLEAN    기능/한글      =              origin/기능/한글 <ROOT>/proj/기능-한글\n\nSummary: total=2 clean=2 dirty=0\n"
+    },
+    "status-mixed": {
+      "argv": [
+        "st"
+      ],
+      "code": 2,
+      "stderr": "",
+      "stdout": "Bare repo: <ROOT>/proj/.bare\n\n\nSTATUS   BRANCH              SYNC           UPSTREAM          PATH\n-------- ------------------- -------------- ----------------- ------------------------------\nCLEAN    (detached 20ed2fdc) detached       -                 <ROOT>/proj/det\nCLEAN    feat/login          ↑1 ↓1          origin/feat/login <ROOT>/proj/feat-login\nDIRTY    feat/x              =              origin/feat/x     <ROOT>/proj/feat-x\nDIRTY    hotfix              =              origin/hotfix     <ROOT>/proj/hotfix\nCLEAN    local-only          no upstream    -                 <ROOT>/proj/local-only\nCLEAN    main                ↓1             origin/main       <ROOT>/proj/main\nCLEAN    staging             ↑1             origin/staging    <ROOT>/proj/staging\nCLEAN    upstream-me         no upstream    -                 <ROOT>/proj/upstream-me\n\nSummary: total=8 clean=6 dirty=2\n"
+    },
+    "status-normal-clone": {
+      "argv": [
+        "status"
+      ],
+      "code": 0,
+      "stderr": "",
+      "stdout": "Bare repo: <ROOT>/normal/.git\n\n\nSTATUS   BRANCH     SYNC           UPSTREAM    PATH\n-------- ---------- -------------- ----------- ------------------------------\nCLEAN    main       =              origin/main <ROOT>/normal\n\nSummary: total=1 clean=1 dirty=0\n"
+    },
+    "status-std": {
+      "argv": [
+        "status"
+      ],
+      "code": 0,
+      "stderr": "",
+      "stdout": "Bare repo: <ROOT>/proj/.bare\n\n\nSTATUS   BRANCH     SYNC           UPSTREAM          PATH\n-------- ---------- -------------- ----------------- ------------------------------\nCLEAN    feat/login =              origin/feat/login <ROOT>/proj/feat-login\nCLEAN    feat/x     =              origin/feat/x     <ROOT>/proj/feat-x\nCLEAN    hotfix     =              origin/hotfix     <ROOT>/proj/hotfix\nCLEAN    main       =              origin/main       <ROOT>/proj/main\nCLEAN    staging    =              origin/staging    <ROOT>/proj/staging\n\nSummary: total=5 clean=5 dirty=0\n"
     },
     "usage-version": {
       "argv": [
@@ -198,7 +230,7 @@
     }
   },
   "reasons": {
-    "abbrev-long-json": "fix 1: --json prints only JSON (no Bare repo header)",
+    "abbrev-long-json": "fix 1 (+ P1 upstream field): --json prints only JSON (no Bare repo header)",
     "add-glob-branch": "fix 7: branch existence is an exact ref lookup, so ma* no longer matches main",
     "add-normal-clone": "fix 6 (+ P1 stderr): in a regular clone wt add needs an explicit path instead of nesting the worktree inside the checkout",
     "add-path-exists": "P1: Error messages go to stderr; stdout keeps progress and results",
@@ -217,7 +249,11 @@
     "rm-remote-without-b": "P1: Error messages go to stderr; stdout keeps progress and results",
     "rm-suffix-in": "fix 2 (+ P1 stderr): identifiers match whole trailing path components, so in no longer matches main and feat-login",
     "status-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
-    "status-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)",
+    "status-json-mixed": "fix 1 (+ P1 upstream field): --json prints only JSON (no Bare repo header)",
+    "status-korean": "P1: status shows the upstream ref (UPSTREAM column, upstream JSON field)",
+    "status-mixed": "P1: status shows the upstream ref (UPSTREAM column, upstream JSON field)",
+    "status-normal-clone": "P1: status shows the upstream ref (UPSTREAM column, upstream JSON field)",
+    "status-std": "P1: status shows the upstream ref (UPSTREAM column, upstream JSON field)",
     "usage-version": "P1: wt --version prints wt <version> (1.x had no such option)"
   }
 }

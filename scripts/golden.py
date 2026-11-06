@@ -47,8 +47,8 @@ EXCEPTIONS: dict[str, tuple[str, str]] = {
 
 # Filled in as Phase 3/4 changes land: case id -> reason.
 CHANGED: dict[str, str] = {
-    "abbrev-long-json": "fix 1: --json prints only JSON (no Bare repo header)",
-    "status-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)",
+    "abbrev-long-json": "fix 1 (+ P1 upstream field): --json prints only JSON (no Bare repo header)",
+    "status-json-mixed": "fix 1 (+ P1 upstream field): --json prints only JSON (no Bare repo header)",
     "status-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
@@ -68,6 +68,10 @@ CHANGED: dict[str, str] = {
     "rm-no-args": "P1: Error messages go to stderr; stdout keeps progress and results",
     "rm-remote-without-b": "P1: Error messages go to stderr; stdout keeps progress and results",
     "init-nonempty-dir": "P1: Error messages go to stderr; stdout keeps progress and results",
+    "status-std": "P1: status shows the upstream ref (UPSTREAM column, upstream JSON field)",
+    "status-mixed": "P1: status shows the upstream ref (UPSTREAM column, upstream JSON field)",
+    "status-korean": "P1: status shows the upstream ref (UPSTREAM column, upstream JSON field)",
+    "status-normal-clone": "P1: status shows the upstream ref (UPSTREAM column, upstream JSON field)",
 }
 
 ENV_BASE = {

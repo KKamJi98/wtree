@@ -689,3 +689,45 @@ fn ambiguous_identifier_needs_all_matches() {
     assert_eq!(code, 0, "{out}");
     assert!(!proj.join("one/api").exists() && !proj.join("two/api").exists());
 }
+
+#[test]
+fn status_shows_the_upstream_ref() {
+    let env = Env::new();
+    let proj = env.layout(&["main"], &["main"]);
+    let bare = proj.join(".bare");
+    let lone = proj.join("lone");
+    env.git(
+        &bare,
+        &[
+            "worktree",
+            "add",
+            "-q",
+            "-b",
+            "lone",
+            lone.to_str().unwrap(),
+            "main",
+        ],
+    );
+    let det = proj.join("det");
+    env.git(
+        &bare,
+        &[
+            "worktree",
+            "add",
+            "-q",
+            "--detach",
+            det.to_str().unwrap(),
+            "main",
+        ],
+    );
+
+    let (_, out, _) = env.wt(&proj.join("main"), &["status", "--json"]);
+    assert!(out.contains("\"upstream\": \"origin/main\""), "{out}");
+    // No upstream and detached HEAD both report null.
+    assert_eq!(out.matches("\"upstream\": null").count(), 2, "{out}");
+
+    let (_, out, _) = env.wt(&proj.join("main"), &["status"]);
+    assert!(out.contains("UPSTREAM"), "{out}");
+    let main_row = out.lines().find(|l| l.contains("CLEAN    main")).unwrap();
+    assert!(main_row.contains("origin/main"), "{out}");
+}

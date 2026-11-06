@@ -10,6 +10,7 @@
 pub enum Value {
     Str(String),
     Int(i64),
+    Null,
     Bool(bool),
     Array(Vec<Value>),
     Object(Vec<(String, Value)>),
@@ -54,6 +55,7 @@ pub fn dumps_compact(value: &Value) -> String {
         Value::Str(s) => quote(s),
         Value::Int(n) => n.to_string(),
         Value::Bool(b) => b.to_string(),
+        Value::Null => "null".to_string(),
         Value::Array(items) => {
             let parts: Vec<String> = items.iter().map(dumps_compact).collect();
             format!("[{}]", parts.join(", "))
