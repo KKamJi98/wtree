@@ -260,7 +260,7 @@ returning non-zero) still clean up.
   (`gh attestation verify` passes, signer `release.yml@refs/tags/v2.0.0`), and
   pushed `Formula/wtree.rb` 2.0.0 to the tap.
 - crates.io: `kkamji-wtree` 2.0.0 was published by hand from a clean clone of
-  the tag (the main checkout holds an untracked `.venv/` whose `LICENSE`
+  the tag (the main checkout holds a git-ignored `.venv/` whose `LICENSE`
   files match the `include` pattern and make `cargo publish` refuse a dirty
   tree). The Trusted Publisher (`KKamJi98/wtree`, `release.yml`, environment
   `release`) was registered right after, so the release run's crates.io job
