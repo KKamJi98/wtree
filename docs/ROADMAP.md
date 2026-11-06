@@ -24,6 +24,14 @@ out. Nothing here is scheduled; each item needs its own design and tests.
 
 ## P2
 
+- **Golden Git diagnostic portability.** `add-glob-branch` currently records
+  Git-owned ref-syntax hint text verbatim. Apple Git 2.50.1 says
+  "See `man git check-ref-format`" where the fixture says
+  "See 'git help check-ref-format'". Normalize just this version-dependent
+  advice in a separately tested change, preserving branch-validation behavior
+  and the error/exit-code checks. The 2.0.2 release only updates the version
+  output expectation; it does not change the comparison rules.
+
 - **Opt-in network timeout.** `--timeout <sec>` for the commands that talk to a
   remote (`fetch`, `pull`, `init`, `remove -b`). There is no default timeout on
   purpose: a large fetch can legitimately take minutes, and git's credential
