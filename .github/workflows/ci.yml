@@ -1,6 +1,4 @@
-# Lint and tests on every push and pull request. The matrix ends are the two
-# that can actually break: 3.9 is the floor requires-python promises, and 3.13
-# is what a fresh `uv tool install` picks today.
+# Lint, tests and parity checks on every push to main and every pull request.
 name: ci
 
 on:
@@ -14,28 +12,90 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
   test:
-    name: python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.9", "3.13"]
+        os: [ubuntu-latest, macos-latest, windows-latest]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: install toolchain
+        shell: bash
+        run: |
+          rustup toolchain install stable --profile minimal --component rustfmt,clippy
+          rustup default stable
+
+      # `wt remove -b` squash detection needs `git merge-tree --write-tree` (2.38+).
+      - run: git --version
+
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets --locked -- -D warnings
+      - run: cargo test --locked
+
+  # Byte-level parity with the Python 1.2.2 release, run live on the same
+  # runner so git-version-dependent text cannot cause false differences.
+  golden:
+    name: golden (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d # v10.0.1
-        with:
-          python-version: ${{ matrix.python-version }}
 
-      - run: uv run --extra dev ruff check .
-      - run: uv run --extra dev ruff format --check .
-      - run: uv run --extra dev pytest -q
-
-      # The tests exercise the module; this catches the packaging metadata that
-      # they never touch, which is where a rename goes wrong.
-      - name: console script resolves
+      - name: install toolchain
         run: |
-          uv tool install .
-          wt --help >/dev/null
+          rustup toolchain install stable --profile minimal
+          rustup default stable
+
+      - run: cargo build --locked
+      - run: python3 scripts/golden.py check --wt target/debug/wt
+
+  deny:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2.1.1
+
+  msrv:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: install the rust-version from Cargo.toml
+        run: |
+          msrv="$(sed -n 's/^rust-version = "\(.*\)"/\1/p' Cargo.toml)"
+          rustup toolchain install "${msrv}" --profile minimal
+          rustup default "${msrv}"
+
+      - run: cargo check --locked --all-targets
+
+      - name: publish dry run
+        run: cargo publish --dry-run --locked
