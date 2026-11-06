@@ -314,3 +314,12 @@ repository secret of the same name). The tap change check also uses
 `git status --porcelain --untracked-files=all`, because in an empty tap a new
 formula shows up as `Formula/`. The new key is first exercised by the next
 release.
+
+Release result (2026-11-07): `v2.0.1` built all five targets with checksums
+and attestations; the crates-io job published 2.0.1 through Trusted
+Publishing (crates.io records `trustpub` provider `github`); the homebrew job
+pushed `Formula/wtree.rb` 2.0.1 with the `release` environment key. After
+`brew upgrade` and `refresh-zfunc-completions.sh`, the first `wt rm <Tab>`
+listed worktree directories on the Mac and on WSL, in a plain `zsh -f` and in
+the login shell with its own rc (fzf-tab switched off for the check, because
+its fzf screen needs a real terminal).
