@@ -10,7 +10,12 @@ use crate::say;
 
 /// Directory name `wt init` derives from a clone URL.
 pub fn repo_dir_name(url: &str) -> String {
-    let name = url.trim_end_matches('/').rsplit('/').next().unwrap_or("");
+    // Split on ':' too, for scp-like URLs without a slash (git@host:repo.git).
+    let name = url
+        .trim_end_matches('/')
+        .rsplit(['/', ':'])
+        .next()
+        .unwrap_or("");
     name.strip_suffix(".git").unwrap_or(name).to_string()
 }
 
@@ -457,7 +462,9 @@ mod tests {
     fn dir_name_from_url() {
         assert_eq!(repo_dir_name("git@github.com:org/repo.git"), "repo");
         assert_eq!(repo_dir_name("https://github.com/org/repo/"), "repo");
-        // 1.x behaviour, fixed in 2.0 (see docs/rust-migration.md, bug 8).
-        assert_eq!(repo_dir_name("git@host:repo.git"), "git@host:repo");
+        // scp-like URL without a slash: 1.x produced "git@host:repo".
+        assert_eq!(repo_dir_name("git@host:repo.git"), "repo");
+        assert_eq!(repo_dir_name("host:team/repo.git"), "repo");
+        assert_eq!(repo_dir_name("/srv/git/repo.git"), "repo");
     }
 }
