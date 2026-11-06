@@ -449,6 +449,70 @@ fn broken_pipe_fails_a_command_that_changes_things() {
     assert_eq!(wt(&["status"]).status.code(), Some(0));
 }
 
+/// Autoload `_wt` from a directory on fpath, as Homebrew and ~/.zfunc do,
+/// and press Tab once on `wt rm `: the first Tab must already list worktrees.
+#[cfg(unix)]
+#[test]
+fn zsh_completes_on_the_first_tab_after_autoload() {
+    let script = {
+        let mut cmd = Command::cargo_bin("wt").unwrap();
+        cmd.env("COMPLETE", "zsh");
+        String::from_utf8(cmd.output().unwrap().stdout).unwrap()
+    };
+    assert!(script.contains("loadautofunc"), "{script}");
+    // Sourced (not autoloaded) it still only registers the completer.
+    assert!(
+        script.contains("compdef _clap_dynamic_completer_wt wt"),
+        "{script}"
+    );
+
+    if Command::new("zsh").arg("--version").output().is_err() {
+        eprintln!("zsh not installed; skipping the live check");
+        return;
+    }
+    let env = Env::new();
+    let proj = env.layout(&["main", "feat/login"], &["main", "feat/login"]);
+    let fpath = env.root.join("fpath");
+    fs::create_dir_all(&fpath).unwrap();
+    fs::write(fpath.join("_wt"), &script).unwrap();
+    let wt_dir = assert_cmd::cargo::cargo_bin("wt")
+        .parent()
+        .unwrap()
+        .to_path_buf();
+    // zpty drives an interactive zsh and prints what the terminal shows
+    // after one Tab: the completion list, or only a bell.
+    let driver = format!(
+        r#"zmodload zsh/zpty
+zpty t 'zsh -f -i'
+zpty -w t "PS1='> '; path=({wt} \$path); fpath=({fpath} \$fpath); autoload -U compinit; compinit -u -D; cd {cwd}"
+out=""
+drain() {{ local c i; for i in {{1..$1}}; do while zpty -r -t t c; do out+=$c; done; sleep 0.1; done; }}
+drain 30
+out="<<TAB>>"
+zpty -w -n t $'wt rm \t'
+drain 40
+zpty -d t
+print -r -- "$out"
+"#,
+        wt = wt_dir.display(),
+        fpath = fpath.display(),
+        cwd = proj.join("main").display(),
+    );
+    let mut cmd = Command::new("zsh");
+    env.apply(&mut cmd);
+    let out = cmd
+        .env("TERM", "dumb")
+        .args(["-f", "-c", &driver])
+        .output()
+        .unwrap();
+    let screen = String::from_utf8_lossy(&out.stdout);
+    assert!(
+        screen.contains("feat-login"),
+        "first Tab showed: {screen:?}\n{}",
+        String::from_utf8_lossy(&out.stderr)
+    );
+}
+
 #[test]
 fn completion_offers_worktree_dirs_and_remote_branches() {
     let env = Env::new();
