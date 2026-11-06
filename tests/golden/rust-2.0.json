@@ -36,6 +36,16 @@
       "stderr": "",
       "stdout": "[\n  {\n    \"branch\": \"(detached 20ed2fdc)\",\n    \"path\": \"<ROOT>/proj/det\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": true\n  },\n  {\n    \"branch\": \"feat/login\",\n    \"path\": \"<ROOT>/proj/feat-login\",\n    \"commit\": \"29f93996\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"feat/x\",\n    \"path\": \"<ROOT>/proj/feat-x\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"hotfix\",\n    \"path\": \"<ROOT>/proj/hotfix\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"local-only\",\n    \"path\": \"<ROOT>/proj/local-only\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"main\",\n    \"path\": \"<ROOT>/proj/main\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"staging\",\n    \"path\": \"<ROOT>/proj/staging\",\n    \"commit\": \"b5cf1aa7\",\n    \"detached\": false\n  },\n  {\n    \"branch\": \"upstream-me\",\n    \"path\": \"<ROOT>/proj/upstream-me\",\n    \"commit\": \"20ed2fdc\",\n    \"detached\": false\n  }\n]\n"
     },
+    "rm-suffix-in": {
+      "argv": [
+        "rm",
+        "--dry-run",
+        "in"
+      ],
+      "code": 1,
+      "stderr": "",
+      "stdout": "Bare repo: <ROOT>/proj/.bare\n\nError: No matching worktrees found.\n  identifiers: in\n\nAvailable worktrees:\n  feat/login                      <ROOT>/proj/feat-login\n  feat/x                          <ROOT>/proj/feat-x\n  hotfix                          <ROOT>/proj/hotfix\n  main                            <ROOT>/proj/main\n  staging                         <ROOT>/proj/staging\n"
+    },
     "status-json-empty": {
       "argv": [
         "status",
@@ -60,6 +70,7 @@
     "list-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-korean": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)",
+    "rm-suffix-in": "fix 2: identifiers match whole trailing path components, so in no longer matches main and feat-login",
     "status-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
     "status-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)"
   }

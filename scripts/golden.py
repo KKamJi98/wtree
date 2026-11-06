@@ -55,6 +55,7 @@ CHANGED: dict[str, str] = {
     "list-json-mixed": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-empty": "fix 1: --json prints only JSON (no Bare repo header)",
     "list-json-korean": "fix 1: --json prints only JSON (no Bare repo header)",
+    "rm-suffix-in": "fix 2: identifiers match whole trailing path components, so in no longer matches main and feat-login",
 }
 
 ENV_BASE = {

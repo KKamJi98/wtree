@@ -457,3 +457,18 @@ fn json_output_is_only_json() {
     let (_, out, _) = env.wt(&proj.join("main"), &["list", "--json"]);
     assert!(out.starts_with('[') && out.ends_with("]\n"), "{out}");
 }
+
+#[test]
+fn identifier_suffix_matches_whole_path_components_only() {
+    let env = Env::new();
+    let proj = env.layout(&["main", "feat/login"], &["main", "feat/login"]);
+    let main = proj.join("main");
+    // "in" is a character suffix of both "main" and "feat-login".
+    let (code, out, _) = env.wt(&main, &["rm", "--dry-run", "in"]);
+    assert_eq!(code, 1, "{out}");
+    assert!(out.contains("No matching worktrees found."), "{out}");
+    // A trailing run of whole components still matches.
+    let (code, out, _) = env.wt(&main, &["rm", "--dry-run", "proj/main"]);
+    assert_eq!(code, 0, "{out}");
+    assert!(out.contains("Matched worktrees: 1"), "{out}");
+}

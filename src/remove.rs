@@ -13,6 +13,9 @@ use crate::say;
 
 /// Matching worktrees for an identifier, by priority:
 /// exact branch or exact path, then directory name, then path suffix.
+///
+/// The suffix must be whole trailing path components (`proj/main`), never a
+/// character suffix: 1.x matched `in` against both `main` and `feat-login`.
 pub fn find_by_identifier<'a>(worktrees: &'a [Worktree], identifier: &str) -> Vec<&'a Worktree> {
     let identifier_path = if identifier.contains('/') || identifier.starts_with('.') {
         Some(paths::resolve(Path::new(identifier)))
@@ -38,7 +41,7 @@ pub fn find_by_identifier<'a>(worktrees: &'a [Worktree], identifier: &str) -> Ve
             dirname.push(wt);
             continue;
         }
-        if wt.path_str().ends_with(identifier) {
+        if Path::new(&wt.path_str()).ends_with(identifier) {
             suffix.push(wt);
         }
     }
@@ -659,8 +662,9 @@ mod tests {
             find_by_identifier(&wts, "feat-login")[0].branch,
             "feat/login"
         );
-        // Character suffix: both paths end with "login" (1.x behaviour).
-        assert_eq!(find_by_identifier(&wts, "login").len(), 2);
+        // Whole components only: "login" is not a component of either path.
+        assert!(find_by_identifier(&wts, "login").is_empty());
+        assert_eq!(find_by_identifier(&wts, "r/x-login").len(), 1);
     }
 
     #[test]
