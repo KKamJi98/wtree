@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="600" viewBox="0 0 1120 600" role="img" aria-labelledby="title desc">
+  <title id="title">One bare repository. Several independent worktrees.</title>
+  <desc id="desc">Fetch and pull bring remote objects and refs into .bare. Four worktrees share that Git database but each checks out its own branch and files. Status reads all worktrees. Pull updates clean worktrees. Add and remove manage checkout directories.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#64748b"/></marker>
+    <style>
+      text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; fill: #172033; }
+      .heading { font-size: 27px; font-weight: 700; }
+      .name { font-size: 21px; font-weight: 650; }
+      .label { font-size: 16px; }
+      .muted { font-size: 15px; fill: #526079; }
+      .link { fill: none; stroke: #64748b; stroke-width: 2; marker-end: url(#arrow); }
+    </style>
+  </defs>
+  <rect width="1120" height="600" rx="16" fill="#ffffff"/>
+  <text x="32" y="48" class="heading">One Git database. Room for every branch.</text>
+  <text x="32" y="78" class="muted">project/ is a container, not a checkout. Run wt from it or any worktree inside it.</text>
+  <rect x="412" y="105" width="676" height="133" rx="12" fill="#f6f8fb" stroke="#ccd5e1"/>
+  <rect x="32" y="123" width="220" height="90" rx="10" fill="#ffffff" stroke="#c6cfdb"/>
+  <text x="52" y="156" class="name">origin / remote</text>
+  <text x="52" y="185" class="muted">shared branch history</text>
+  <path d="M252 174H412" class="link"/>
+  <text x="273" y="138" class="label">wt fetch / wt pull</text>
+  <text x="283" y="160" class="muted">objects + refs</text>
+  <text x="442" y="144" class="name">.bare/</text>
+  <text x="442" y="173" class="label">Shared objects, refs, and worktree registrations</text>
+  <text x="442" y="205" class="muted">No duplicate clone for each branch</text>
+  <path d="M750 238V268H157V322" class="link"/>
+  <path d="M750 268H425V322" class="link"/>
+  <path d="M750 268H693V322" class="link"/>
+  <path d="M750 268H961V322" class="link"/>
+  <rect x="50" y="281" width="215" height="27" fill="#ffffff"/>
+  <rect x="318" y="281" width="215" height="27" fill="#ffffff"/>
+  <rect x="586" y="281" width="215" height="27" fill="#ffffff"/>
+  <rect x="854" y="281" width="215" height="27" fill="#ffffff"/>
+  <text x="58" y="303" class="muted">checkout + branch ref</text>
+  <text x="326" y="303" class="muted">checkout + branch ref</text>
+  <text x="594" y="303" class="muted">checkout + branch ref</text>
+  <text x="862" y="303" class="muted">checkout + branch ref</text>
+  <rect x="32" y="329" width="250" height="102" rx="10" fill="#eef9f3" stroke="#91cbb0"/>
+  <text x="52" y="364" class="name">main/</text>
+  <text x="52" y="395" class="label">branch: main</text>
+  <rect x="300" y="329" width="250" height="102" rx="10" fill="#fff6e9" stroke="#e2bd80"/>
+  <text x="320" y="364" class="name">feat-login/</text>
+  <text x="320" y="395" class="label">branch: feat/login</text>
+  <rect x="568" y="329" width="250" height="102" rx="10" fill="#eef5ff" stroke="#a7bfdf"/>
+  <text x="588" y="364" class="name">fix-typo/</text>
+  <text x="588" y="395" class="label">branch: fix/typo</text>
+  <rect x="836" y="329" width="250" height="102" rx="10" fill="#f5f1fd" stroke="#c5b4e4"/>
+  <text x="856" y="364" class="name">release-1.2/</text>
+  <text x="856" y="395" class="label">branch: release/1.2</text>
+  <text x="32" y="462" class="muted">Each worktree has its own files, index, and HEAD. Commit objects are shared.</text>
+  <path d="M32 486H1088" stroke="#e2e8f0"/>
+  <text x="32" y="519" class="name">Read</text>
+  <text x="32" y="548" class="label">wt status / wt list</text>
+  <text x="32" y="575" class="muted">inspect every checkout</text>
+  <text x="385" y="519" class="name">Sync</text>
+  <text x="385" y="548" class="label">wt pull</text>
+  <text x="385" y="575" class="muted">fast-forward clean checkouts</text>
+  <text x="748" y="519" class="name">Create / clean up</text>
+  <text x="748" y="548" class="label">wt add / wt rm</text>
+  <text x="748" y="575" class="muted">change checkout directories</text>
+</svg>
