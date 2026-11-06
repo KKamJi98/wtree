@@ -251,3 +251,32 @@ output, the working directory disappears) during `wt init` after the clone,
 `wt` ends with `Error:` and exit 1 without the cleanup of fix 4, and the new
 `.bare` stays behind. Normal git failures (`clone`, `fetch`, `worktree add`
 returning non-zero) still clean up.
+
+## Release (2026-11-07)
+
+- PR #1 squash-merged as `3274e8b`; main CI green.
+- `v2.0.0` (annotated) pushed; the release run built all five targets,
+  `SHA256SUMS` and per-archive `.sha256`, build provenance attestations
+  (`gh attestation verify` passes, signer `release.yml@refs/tags/v2.0.0`), and
+  pushed `Formula/wtree.rb` 2.0.0 to the tap.
+- crates.io: `kkamji-wtree` 2.0.0 was published by hand from a clean clone of
+  the tag (the main checkout holds an untracked `.venv/` whose `LICENSE`
+  files match the `include` pattern and make `cargo publish` refuse a dirty
+  tree). The Trusted Publisher (`KKamJi98/wtree`, `release.yml`, environment
+  `release`) was registered right after, so the release run's crates.io job
+  found 2.0.0 already published and skipped.
+
+### Differences from the plan found during the release
+
+- Mac install order: after `brew install`, `command -v wt` still pointed at
+  the uv tool shim in `~/.local/bin`, which comes first in `PATH`. The brew
+  binary (`/opt/homebrew/bin/wt`, `wt 2.0.0`) was checked by full path, then
+  `uv tool uninstall wtree` ran, and `command -v wt` became the brew path.
+- zsh completion: the `COMPLETE=zsh wt` script from clap_complete 4.6.11 only
+  registers its completer when zsh autoloads it from `fpath`. The first
+  `wt <Tab>` in each shell therefore rings the bell without candidates; from
+  the second Tab on, worktree directory names and options are offered
+  (checked on macOS with `~/.zfunc/_wt` and on WSL with the Homebrew
+  site-functions file). The 1.x argcomplete script called its completer on
+  the autoload pass. A wrapper that does the same would need a custom zsh
+  completer in `wt` and a new release; it was not done in 2.0.0.
