@@ -59,6 +59,7 @@ CHANGED: dict[str, str] = {
     "init-clone-fails": "fix 4: a failed init removes the directory it created",
     "init-credential-url": "fix 4: a failed init removes the directory it created",
     "init-into-file": "fix 5: a file at the target path is a clear error instead of a NotADirectoryError traceback",
+    "add-normal-clone": "fix 6: in a regular clone wt add needs an explicit path instead of nesting the worktree inside the checkout",
 }
 
 ENV_BASE = {

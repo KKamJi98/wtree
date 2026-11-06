@@ -9,6 +9,15 @@
       "stderr": "",
       "stdout": "{\n  \"worktrees\": [\n    {\n      \"branch\": \"feat/login\",\n      \"path\": \"<ROOT>/proj/feat-login\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"feat/x\",\n      \"path\": \"<ROOT>/proj/feat-x\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"hotfix\",\n      \"path\": \"<ROOT>/proj/hotfix\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"main\",\n      \"path\": \"<ROOT>/proj/main\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    },\n    {\n      \"branch\": \"staging\",\n      \"path\": \"<ROOT>/proj/staging\",\n      \"commit\": \"20ed2fdc\",\n      \"status\": \"clean\",\n      \"sync\": \"=\",\n      \"detached\": false\n    }\n  ],\n  \"summary\": {\n    \"total\": 5,\n    \"clean\": 5,\n    \"dirty\": 0\n  }\n}\n"
     },
+    "add-normal-clone": {
+      "argv": [
+        "add",
+        "feat/x"
+      ],
+      "code": 1,
+      "stderr": "",
+      "stdout": "Bare repo: <ROOT>/normal/.git\n\nError: '<ROOT>/normal' is a regular clone, not a .bare layout; the default path would be inside its working tree.\n  give the worktree path explicitly: wt add feat/x <path>\n"
+    },
     "init-clone-fails": {
       "argv": [
         "init",
@@ -107,6 +116,7 @@
   },
   "reasons": {
     "abbrev-long-json": "fix 1: --json prints only JSON (no Bare repo header)",
+    "add-normal-clone": "fix 6: in a regular clone wt add needs an explicit path instead of nesting the worktree inside the checkout",
     "init-clone-fails": "fix 4: a failed init removes the directory it created",
     "init-credential-url": "fix 4: a failed init removes the directory it created",
     "init-into-file": "fix 5: a file at the target path is a clear error instead of a NotADirectoryError traceback",

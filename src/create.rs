@@ -304,6 +304,20 @@ pub fn cmd_add(
     create: bool,
     base: Option<&str>,
 ) -> i32 {
+    // In a regular clone the common dir is <repo>/.git, and its parent is the
+    // main working tree: the default location would nest the new worktree
+    // inside the checkout. Only the .bare layout has a container parent.
+    if path.is_none() && bare_repo.file_name().is_some_and(|n| n == ".git") {
+        say!(
+            "{}Error:{} '{}' is a regular clone, not a .bare layout; the default path would be inside its working tree.",
+            red(),
+            reset(),
+            bare_repo.parent().unwrap_or(bare_repo).display()
+        );
+        say!("  give the worktree path explicitly: wt add {branch} <path>");
+        return 1;
+    }
+
     let wt_path: PathBuf = match path {
         None => bare_repo
             .parent()

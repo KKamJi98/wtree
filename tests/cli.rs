@@ -539,3 +539,31 @@ fn init_onto_a_file_is_a_clear_error() {
     assert!(out.contains("exists and is not a directory."), "{out}{err}");
     assert!(err.is_empty(), "{err}");
 }
+
+#[test]
+fn add_in_a_regular_clone_needs_an_explicit_path() {
+    let env = Env::new();
+    env.layout(&["main", "feat/x"], &[]);
+    let clone = env.root.join("clone");
+    let origin = env.root.join("origin.git");
+    env.git(
+        &env.root,
+        &[
+            "clone",
+            "-q",
+            origin.to_str().unwrap(),
+            clone.to_str().unwrap(),
+        ],
+    );
+    let (code, out, _) = env.wt(&clone, &["add", "feat/x"]);
+    assert_eq!(code, 1, "{out}");
+    assert!(out.contains("wt add feat/x <path>"), "{out}");
+    assert!(
+        !clone.join("feat-x").exists(),
+        "nothing created inside the clone"
+    );
+
+    let (code, out, _) = env.wt(&clone, &["add", "feat/x", "../clone-feat-x"]);
+    assert_eq!(code, 0, "{out}");
+    assert!(env.root.join("clone-feat-x").is_dir());
+}
