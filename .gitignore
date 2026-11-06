@@ -16,3 +16,6 @@ venv/
 .idea/
 .vscode/
 *.swp
+
+# Rust
+/target/

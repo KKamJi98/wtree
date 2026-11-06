@@ -1,6 +1,6 @@
 # wtree
 
-[![PyPI](https://img.shields.io/pypi/v/wtree)](https://pypi.org/project/wtree/)
+[![crates.io](https://img.shields.io/crates/v/kkamji-wtree)](https://crates.io/crates/kkamji-wtree)
 [![CI](https://github.com/KKamJi98/wtree/actions/workflows/ci.yml/badge.svg)](https://github.com/KKamJi98/wtree/actions/workflows/ci.yml)
 
 Manage a bare repository and its worktrees from any directory inside it.
@@ -10,7 +10,8 @@ the bookkeeping to you: which worktrees exist, which are behind, which have
 uncommitted work, and which branch is safe to delete. `wt` answers those from
 wherever you happen to be standing.
 
-The package is `wtree`; the command is `wt`.
+The command is `wt`. It is a single native binary: the Homebrew formula is
+`wtree`, the crates.io crate is `kkamji-wtree` (the name `wtree` was taken).
 
 ## Features
 
@@ -24,15 +25,65 @@ The package is `wtree`; the command is `wt`.
 ## Installation
 
 ```bash
-# PyPI
-uv tool install wtree
+# Homebrew (macOS, Linux)
+brew install KKamJi98/tap/wtree
 
-# Straight from the repository
-uv tool install git+https://github.com/KKamJi98/wtree
+# crates.io
+cargo install --locked kkamji-wtree
 
-# Local development
-uv tool install --editable .
+# From a checkout
+cargo install --locked --path .
 ```
+
+Prebuilt archives for macOS (arm64, x86_64), Linux (x86_64, aarch64, static
+musl) and Windows (x86_64) are attached to every
+[GitHub Release](https://github.com/KKamJi98/wtree/releases), with SHA-256
+checksums and build provenance attestations
+(`gh attestation verify <archive> --repo KKamJi98/wtree`).
+
+### Moving from the Python version (1.x)
+
+Versions up to 1.2.2 were a Python package on PyPI. 2.0 is a Rust rewrite with
+the same commands and output. Replace the old install:
+
+```bash
+uv tool uninstall wtree
+brew install KKamJi98/tap/wtree     # or: cargo install --locked kkamji-wtree
+```
+
+Shell completion moved from argcomplete to the binary itself; regenerate it
+(see [Shell completion](#shell-completion)). PyPI 1.2.2 stays available:
+`uv tool install wtree==1.2.2` brings the old version back.
+
+### `wt` name conflicts
+
+Other tools also install a `wt` command:
+
+- Homebrew `worktrunk` and `wiredtiger` (the formula declares `conflicts_with`
+  for both, so `brew` refuses to install them side by side)
+- the crates.io crates `wtree` and `worktrunk`; `cargo install` refuses to
+  overwrite a `wt` that another crate installed
+- on Windows, Windows Terminal's `wt.exe` App Execution Alias. Turn it off in
+  Settings > Apps > Advanced app settings > App execution aliases, or call this
+  `wt.exe` by its full path.
+
+### Shell completion
+
+Completion is dynamic: worktree directories and remote branches are looked up
+when you press Tab, matched by case-insensitive substring.
+
+```bash
+# zsh: write it into a directory on $fpath
+COMPLETE=zsh wt > ~/.zfunc/_wt
+
+# bash
+echo 'source <(COMPLETE=bash wt)' >> ~/.bashrc
+
+# fish
+echo 'COMPLETE=fish wt | source' >> ~/.config/fish/config.fish
+```
+
+The Homebrew formula installs completions for bash, zsh and fish.
 
 ## Quick Start
 
@@ -98,6 +149,12 @@ wt remove --match "feat/*" --dry-run
 wt remove staging -f
 ```
 
+An identifier is matched as an exact branch name or path first, then as a
+worktree directory name, then as trailing path components (`proj/main`), never
+as a partial word. When one identifier still matches several worktrees (two
+directories called `api`, say), `wt remove` stops and lists them, even with
+`-y`; name one by path, or pass `--all-matches` to remove them all.
+
 `wt remove` takes the worktree entry and its directory, and nothing else. Pass
 `-b/--branch` to delete the local branch too, and `--remote` on top of that to
 delete the remote one. `--remote` without `-b` is an error rather than a
@@ -125,7 +182,13 @@ wt upstream                   # only if it has no upstream yet
 ```bash
 wt status
 wt st
+
+# Machine-readable: stdout carries only the JSON document
+wt status --json | jq '.worktrees[] | select(.status == "dirty") | .path'
 ```
+
+Each worktree reports `status` (clean/dirty), `sync` (ahead/behind),
+`upstream` (the tracked ref, or `null`) and `detached`.
 
 ### Sync
 
@@ -195,11 +258,11 @@ To add more worktrees:
 ```
 Bare repo: /path/to/repo/.bare
 
-STATUS   BRANCH                    SYNC           PATH
--------- ------------------------- -------------- ----------------------------------------
-CLEAN    main                      =              /path/to/repo/main
-CLEAN    staging                   ↓3             /path/to/repo/staging
-DIRTY    feat/new-feature          ↑2             /path/to/repo/feat-new-feature
+STATUS   BRANCH           SYNC           UPSTREAM                PATH
+-------- ---------------- -------------- ----------------------- ------------------------------
+CLEAN    main             =              origin/main             /path/to/repo/main
+CLEAN    staging          ↓3             origin/staging          /path/to/repo/staging
+DIRTY    feat/new-feature ↑2             origin/feat/new-feature /path/to/repo/feat-new-feature
 
 Summary: total=3 clean=2 dirty=1
 ```
@@ -281,6 +344,8 @@ git worktree add ../staging staging
 | `wt pull --rebase` | `p -r` | Fetch, then rebase |
 | `wt list` | `ls` | List worktrees |
 | `wt upstream` | `up` | Set the missing upstreams |
+| `wt prune [--dry-run]` | - | Remove stale worktree references |
+| `wt --version` | - | Print the version |
 
 ## Exit Codes
 
@@ -293,15 +358,33 @@ git worktree add ../staging staging
 | `2` | Partly done: some `SKIP`, `WARN(kept)`, or `FAIL`, or an identifier that matched nothing |
 
 `status` returns `2` when any worktree is dirty, and `remove` returns `2` when it
-kept a branch it was asked to delete.
+kept a branch it was asked to delete. A command line that cannot be parsed
+(unknown option, missing argument) also exits `2`.
+
+`Error:` messages go to stderr; progress lines, results and summaries go to
+stdout.
 
 ## Requirements
 
-- Python 3.9+
+- `git` on `PATH` (the binary has no other runtime dependency)
 - Git 2.15+ for worktrees
 - Git 2.38+ for `wt remove -b` to recognise squash and rebase merges, which needs
   `merge-tree --write-tree`. On older Git those branches are kept and have to be
   deleted by hand.
+
+## Development
+
+```bash
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo test
+
+# Output parity with the last Python release (needs uv for wtree 1.2.2)
+cargo build && python3 scripts/golden.py check --wt target/debug/wt
+```
+
+`docs/rust-migration.md` records how the Rust port was verified against 1.2.2
+and which behaviour changed in 2.0.
 
 ## License
 
