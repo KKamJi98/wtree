@@ -280,3 +280,15 @@ returning non-zero) still clean up.
   site-functions file). The 1.x argcomplete script called its completer on
   the autoload pass. A wrapper that does the same would need a custom zsh
   completer in `wt` and a new release; it was not done in 2.0.0.
+
+### After the release: tap key in the `release` environment (2026-11-07)
+
+To match prjump, the `homebrew` job now runs in the `release` environment, like
+`crates-io`, and reads `HOMEBREW_TAP_DEPLOY_KEY` as an environment secret, so
+only a `v*` tag release can read the key. Ethan registers a new key as the
+environment secret and removes the repository-level secret and the old deploy
+key after this change is on main (an environment secret takes precedence over a
+repository secret of the same name). The tap change check also uses
+`git status --porcelain --untracked-files=all`, because in an empty tap a new
+formula shows up as `Formula/`. The new key is first exercised by the next
+release.

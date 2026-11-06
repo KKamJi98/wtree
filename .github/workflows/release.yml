@@ -208,6 +208,9 @@ jobs:
   homebrew:
     needs: [check, release]
     runs-on: ubuntu-latest
+    # Same environment as crates-io: it only admits v* tags, and the tap
+    # deploy key is an environment secret, so only a tag release can read it.
+    environment: release
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -224,8 +227,8 @@ jobs:
           VERSION: ${{ needs.check.outputs.version }}
         run: bash scripts/release/render-formula.sh "${VERSION}" dist > "${RUNNER_TEMP}/wtree.rb"
 
-      # The deploy key belongs to this repository and can write to
-      # KKamJi98/homebrew-tap only. github.com's host key is pinned from
+      # The deploy key (environment `release` secret) belongs to this
+      # repository and can write to KKamJi98/homebrew-tap only. github.com's host key is pinned from
       # https://api.github.com/meta. Only Formula/wtree.rb is ever committed.
       - name: push Formula/wtree.rb
         env:
@@ -248,12 +251,14 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           mkdir -p Formula
           cp "${RUNNER_TEMP}/wtree.rb" Formula/wtree.rb
-          if [[ -z "$(git status --porcelain)" ]]; then
+          # --untracked-files=all: in an empty tap a new file would show up
+          # as its directory, "Formula/".
+          changed="$(git status --porcelain --untracked-files=all | awk '{print $2}')"
+          if [[ -z "${changed}" ]]; then
             echo "Formula/wtree.rb already up to date"
             exit 0
           fi
-          changed="$(git status --porcelain | awk '{print $2}')"
-          if [[ "${changed}" != "Formula/wtree.rb" && "${changed}" != "Formula/" ]]; then
+          if [[ "${changed}" != "Formula/wtree.rb" ]]; then
             echo "refusing to commit unexpected changes: ${changed}" >&2
             exit 1
           fi
